@@ -2,15 +2,12 @@ import { Menu, MessageCircle, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./Button";
 import { defaultWhatsappUrl, navItems } from "@/data/djawan";
+import logoAsset from "@/assets/djawan-logo.png.asset.json";
 
 export function Brand({ light = false }: { light?: boolean }) {
   return (
-    <a href="#accueil" aria-label="Djawan Sahel Meat — Accueil" className="flex shrink-0 items-center gap-3">
-      <span className="grid size-10 place-items-center rounded-full border-2 border-primary font-display text-sm font-black text-primary">DSM</span>
-      <span className={light ? "text-cream" : "text-brown"}>
-        <span className="block font-display text-lg leading-none font-black">DJAWAN</span>
-        <span className="mt-1 block text-[9px] font-bold tracking-[0.2em] text-primary">SAHEL MEAT</span>
-      </span>
+    <a href="#accueil" aria-label="Djawan Sahel Meat — Accueil" className="block shrink-0">
+      <img src={logoAsset.url} alt="Djawan Sahel Meat" width={768} height={768} className={light ? "h-16 w-auto rounded-sm bg-cream object-contain" : "h-16 w-auto object-contain"} />
     </a>
   );
 }
