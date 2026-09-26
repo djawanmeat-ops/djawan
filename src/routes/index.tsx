@@ -1,24 +1,137 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ArrowDown, ArrowRight, BadgeCheck, Beef, CheckCircle2, Clock3, Handshake, MapPin, MessageCircle, PackageCheck, ShieldCheck, Sparkles, Truck } from "lucide-react";
+import heroImage from "@/assets/djawan-hero.jpg";
+import storyImage from "@/assets/djawan-story.jpg";
+import { Header } from "@/components/site/Header";
+import { Footer } from "@/components/site/Footer";
+import { Button } from "@/components/site/Button";
+import { SectionTitle } from "@/components/site/SectionTitle";
+import { FeatureCard } from "@/components/site/FeatureCard";
+import { BoxCard } from "@/components/site/BoxCard";
+import { FAQItem } from "@/components/site/FAQItem";
+import { Reveal } from "@/components/site/Reveal";
+import { boxes, defaultWhatsappUrl, faqs, whatsappUrl } from "@/data/djawan";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Djawan Sahel Meat — Viande fraîche et box à Bamako" },
+      { name: "description", content: "Djawan Sahel Meat propose des box de viande fraîche avec livraison à domicile à Bamako et environs. Découvrez nos formats et commandez facilement sur WhatsApp." },
+      { property: "og:title", content: "Djawan Sahel Meat — Viande fraîche et box à Bamako" },
+      { property: "og:description", content: "Des box de viande fraîche, adaptées à vos besoins et livrées à Bamako et environs." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "/" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="overflow-x-clip bg-background">
+      <Header />
+      <main>
+        <section id="accueil" className="relative min-h-[92svh] overflow-hidden bg-brown pt-20 text-cream">
+          <img src={heroImage} alt="Sélection de viandes fraîches Djawan Sahel Meat" width={1600} height={1104} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-[62%_center]" />
+          <div className="absolute inset-0 bg-hero-overlay" />
+          <div className="relative mx-auto flex min-h-[calc(92svh-5rem)] max-w-7xl items-center px-5 py-16 lg:px-8">
+            <div className="hero-enter max-w-3xl">
+              <p className="mb-6 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-gold"><span className="h-px w-10 bg-gold" />Bamako & environs</p>
+              <h1 className="font-display max-w-2xl text-5xl leading-[0.96] font-black sm:text-7xl lg:text-[5.5rem]">La viande fraîche à portée de main.</h1>
+              <p className="mt-7 max-w-xl text-base leading-7 text-cream/80 sm:text-lg">Djawan Sahel Meat, c'est des viandes de qualité, des box adaptées à vos besoins et une livraison à domicile à Bamako.</p>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                <Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer"><MessageCircle size={19} /> Commander sur WhatsApp</Button>
+                <Button href="#box" variant="light">Découvrir nos box <ArrowDown size={18} /></Button>
+              </div>
+            </div>
+          </div>
+          <div className="relative border-t border-cream/20 px-5 py-5 lg:px-8"><p className="mx-auto max-w-7xl text-xs font-extrabold tracking-[0.2em] text-cream/80">VIANDE FRAÎCHE <span className="text-gold">•</span> QUALITÉ <span className="text-gold">•</span> CONFIANCE</p></div>
+        </section>
+
+        <section className="border-b border-border bg-cream px-5 py-10 lg:px-8">
+          <div className="mx-auto grid max-w-7xl gap-7 sm:grid-cols-2 lg:grid-cols-4">
+            <FeatureCard icon={Beef} title="Viande fraîche" text="Des produits sélectionnés avec attention." />
+            <FeatureCard icon={BadgeCheck} title="Qualité" text="Une attention portée à la qualité." />
+            <FeatureCard icon={Truck} title="Livraison" text="Bamako et environs." />
+            <FeatureCard icon={MessageCircle} title="Commande simple" text="Directement sur WhatsApp." />
+          </div>
+        </section>
+
+        <section id="box" className="scroll-mt-20 px-5 py-24 lg:px-8 lg:py-32">
+          <div className="mx-auto max-w-7xl">
+            <Reveal><SectionTitle eyebrow="Nos box" title="Des box adaptées à vos besoins." text="Choisissez le format qui vous convient et profitez de viandes fraîches et de qualité, livrées chez vous." /></Reveal>
+            <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              {boxes.map((box, index) => <Reveal key={box.name} delay={index * 90}><BoxCard box={box} index={index} /></Reveal>)}
+            </div>
+          </div>
+        </section>
+
+        <section id="apropos" className="scroll-mt-20 bg-cream px-5 py-24 lg:px-8 lg:py-32">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
+            <Reveal><div className="overflow-hidden rounded-lg"><img src={storyImage} alt="Préparation attentive de viande fraîche chez Djawan Sahel Meat" width={1408} height={1008} loading="lazy" className="aspect-[4/3] h-full w-full object-cover" /></div></Reveal>
+            <Reveal><SectionTitle eyebrow="Notre histoire" title="Plus qu'une viande, une expérience de confiance." text="Djawan Sahel Meat propose des viandes sélectionnées avec attention et des box adaptées aux différents besoins des foyers. Notre engagement repose sur la fraîcheur, la qualité, le service et la satisfaction de nos clients." /></Reveal>
+          </div>
+        </section>
+
+        <section className="bg-brown px-5 py-24 lg:px-8 lg:py-28">
+          <div className="mx-auto max-w-7xl">
+            <Reveal><SectionTitle eyebrow="Pourquoi Djawan ?" title="Le bon choix, à chaque étape." light /></Reveal>
+            <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              <FeatureCard dark icon={Sparkles} title="Fraîcheur" text="Des viandes sélectionnées avec attention." />
+              <FeatureCard dark icon={ShieldCheck} title="Qualité" text="Une attention portée à la qualité des produits." />
+              <FeatureCard dark icon={Truck} title="Livraison" text="Vos commandes livrées à Bamako et environs." />
+              <FeatureCard dark icon={Handshake} title="Confiance" text="Un service pensé pour construire une relation durable." />
+            </div>
+          </div>
+        </section>
+
+        <section id="commande" className="scroll-mt-20 px-5 py-24 lg:px-8 lg:py-32">
+          <div className="mx-auto max-w-7xl">
+            <Reveal><SectionTitle eyebrow="Comment ça marche ?" title="Commander, c'est aussi simple que ça." centered /></Reveal>
+            <div className="relative mt-16 grid gap-10 md:grid-cols-3">
+              {[{n:"01",t:"Choisissez votre box",d:"5 kg, 10 kg, 15 kg ou 20 kg.",i:PackageCheck},{n:"02",t:"Commandez sur WhatsApp",d:"Envoyez votre demande directement à Djawan Sahel Meat.",i:MessageCircle},{n:"03",t:"Recevez votre commande",d:"Votre box est livrée à Bamako et environs.",i:Truck}].map((step, index) => <Reveal key={step.n} delay={index*100}><div className="text-center"><div className="mx-auto grid size-20 place-items-center rounded-full bg-gold text-brown"><step.i size={28} /></div><p className="mt-6 text-xs font-black tracking-[0.18em] text-primary">{step.n}</p><h3 className="mt-2 font-display text-2xl font-bold text-brown">{step.t}</h3><p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-muted-foreground">{step.d}</p></div></Reveal>)}
+            </div>
+            <div className="mt-12 text-center"><Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer">Commander maintenant <ArrowRight size={18} /></Button></div>
+          </div>
+        </section>
+
+        <section id="credit" className="scroll-mt-20 bg-sun px-5 py-24 lg:px-8 lg:py-28">
+          <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+            <Reveal><SectionTitle eyebrow="Avatar Crédit" title="Votre box maintenant. Votre paiement en 3 tranches." text="Avec l'Avatar Crédit, choisissez la box qui vous convient et payez en trois tranches sur 28 jours." /></Reveal>
+            <Reveal>
+              <div className="rounded-lg bg-brown p-7 text-cream sm:p-10">
+                <div className="grid gap-5 sm:grid-cols-3">
+                  {["Choisissez votre box", "Payez en 3 tranches", "Sur 28 jours"].map((item, index) => <div key={item} className="credit-step border-l border-gold/60 pl-4"><span className="text-xs font-black text-gold">0{index+1}</span><p className="mt-2 font-display text-xl font-bold">{item}</p></div>)}
+                </div>
+                <p className="my-8 border-y border-cream/15 py-5 text-sm font-bold tracking-[0.12em] text-gold">5 KG • 10 KG • 15 KG • 20 KG</p>
+                <Button variant="light" href={whatsappUrl("Bonjour Djawan Sahel Meat, je souhaite en savoir plus sur l’Avatar Crédit.")} target="_blank" rel="noreferrer">Découvrir l'Avatar Crédit <ArrowRight size={18} /></Button>
+                <p className="mt-5 text-xs text-cream/50">Conditions officielles détaillées à venir.</p>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section className="relative min-h-[620px] overflow-hidden bg-brown px-5 py-24 text-cream lg:px-8 lg:py-32">
+          <img src={heroImage} alt="Viandes fraîches sélectionnées avec soin" width={1600} height={1104} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-right" />
+          <div className="absolute inset-0 bg-commitment-overlay" />
+          <Reveal className="relative mx-auto max-w-7xl"><p className="text-xs font-black uppercase tracking-[0.2em] text-gold">Nos engagements</p><h2 className="mt-8 max-w-3xl font-display text-5xl leading-[1.05] font-black sm:text-7xl">La fraîcheur.<br />La qualité.<br />La confiance.</h2><p className="mt-8 max-w-lg leading-7 text-cream/75">Trois piliers pour vous proposer une expérience simple, soignée et fidèle à vos attentes.</p></Reveal>
+        </section>
+
+        <section id="faq" className="scroll-mt-20 bg-cream px-5 py-24 lg:px-8 lg:py-32">
+          <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.65fr_1fr] lg:gap-24">
+            <Reveal><SectionTitle eyebrow="Questions fréquentes" title="Tout ce qu'il faut savoir." text="Une question supplémentaire ? Écrivez-nous directement sur WhatsApp." /></Reveal>
+            <Reveal><div>{faqs.map((faq) => <FAQItem key={faq.question} {...faq} />)}</div></Reveal>
+          </div>
+        </section>
+
+        <section className="bg-primary px-5 py-20 text-center text-primary-foreground lg:px-8">
+          <Reveal><div className="mx-auto max-w-3xl"><CheckCircle2 className="mx-auto text-gold" size={36} /><h2 className="mt-6 font-display text-4xl font-black sm:text-5xl">Prêt à commander votre box ?</h2><p className="mt-5 text-primary-foreground/75">Votre viande fraîche vous attend. Commandez directement sur WhatsApp.</p><Button variant="light" href={defaultWhatsappUrl} target="_blank" rel="noreferrer" className="mt-8"><MessageCircle size={19} /> Commander sur WhatsApp</Button></div></Reveal>
+        </section>
+      </main>
+      <Footer />
+      <a href={defaultWhatsappUrl} target="_blank" rel="noreferrer" aria-label="Commander sur WhatsApp" className="fixed bottom-5 right-5 z-40 grid size-14 place-items-center rounded-full bg-whatsapp text-whatsapp-foreground shadow-lg transition hover:scale-105 md:hidden"><MessageCircle size={25} /></a>
     </div>
   );
 }

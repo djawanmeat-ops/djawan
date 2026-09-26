@@ -19,6 +19,8 @@
  */
 
 @theme inline {
+  --font-sans: "DM Sans", sans-serif;
+  --font-display: "Manrope", sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -59,29 +61,41 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-brown: var(--brown);
+  --color-cream: var(--cream);
+  --color-gold: var(--gold);
+  --color-sun: var(--sun);
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-foreground: var(--whatsapp-foreground);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --radius: 0.5rem;
+  --background: oklch(0.985 0.012 77);
+  --foreground: oklch(0.23 0.048 48);
+  --card: oklch(0.995 0.006 78);
+  --card-foreground: oklch(0.23 0.048 48);
+  --popover: oklch(0.995 0.006 78);
+  --popover-foreground: oklch(0.23 0.048 48);
+  --primary: oklch(0.48 0.175 31);
+  --primary-foreground: oklch(0.985 0.012 77);
+  --secondary: oklch(0.74 0.14 58);
+  --secondary-foreground: oklch(0.23 0.048 48);
+  --muted: oklch(0.94 0.025 78);
+  --muted-foreground: oklch(0.47 0.035 53);
+  --accent: oklch(0.82 0.15 78);
+  --accent-foreground: oklch(0.23 0.048 48);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --border: oklch(0.86 0.035 70);
+  --input: oklch(0.86 0.035 70);
+  --ring: oklch(0.57 0.17 38);
+  --brown: oklch(0.255 0.052 47);
+  --cream: oklch(0.965 0.027 79);
+  --gold: oklch(0.82 0.15 78);
+  --sun: oklch(0.925 0.105 83);
+  --whatsapp: oklch(0.67 0.19 147);
+  --whatsapp-foreground: oklch(1 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,5 +154,43 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    letter-spacing: 0;
   }
+
+  html { scroll-behavior: smooth; }
+
+  button, a { -webkit-tap-highlight-color: transparent; }
+}
+
+.bg-hero-overlay {
+  background: linear-gradient(90deg, oklch(0.18 0.045 45 / 0.96) 0%, oklch(0.18 0.045 45 / 0.72) 45%, oklch(0.18 0.045 45 / 0.08) 78%);
+}
+
+.bg-commitment-overlay {
+  background: linear-gradient(90deg, oklch(0.18 0.045 45 / 0.95) 0%, oklch(0.18 0.045 45 / 0.82) 42%, oklch(0.18 0.045 45 / 0.18) 80%);
+}
+
+.mobile-menu { max-height: 0; overflow: hidden; transition: max-height 300ms ease; }
+.mobile-menu.is-open { max-height: 34rem; }
+.faq-item[open] .faq-icon { transform: rotate(180deg); }
+
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 650ms ease, transform 650ms ease; }
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
+.hero-enter { animation: hero-in 800ms ease-out both; }
+.credit-step { animation: credit-breathe 2.8s ease-in-out both; }
+.credit-step:nth-child(2) { animation-delay: 180ms; }
+.credit-step:nth-child(3) { animation-delay: 360ms; }
+
+@keyframes hero-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes credit-breathe { 0% { opacity: 0; transform: translateY(8px); } 30%, 100% { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 640px) {
+  .bg-hero-overlay { background: linear-gradient(90deg, oklch(0.18 0.045 45 / 0.92), oklch(0.18 0.045 45 / 0.55)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .reveal { opacity: 1; transform: none; }
 }

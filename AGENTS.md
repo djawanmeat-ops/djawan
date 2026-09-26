@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep the marketing site as one anchored landing page because the requested conversion journey is intentionally continuous.
+- Store product-box content in `src/data/djawan.ts` so commercial content remains editable independently from presentation.
