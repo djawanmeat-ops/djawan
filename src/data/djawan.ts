@@ -1,5 +1,7 @@
 import boxDecouverte from "@/assets/box-decouverte.jpg";
 import boxFamily from "@/assets/box-family.jpg";
+import boxConviviale from "@/assets/box-conviviale.jpg";
+import boxFestin from "@/assets/box-festin.jpg";
 
 export const navItems = [
   { label: "Accueil", href: "#accueil" },
@@ -30,14 +32,14 @@ export const boxes = [
     weight: "15 kg",
     description: "Pour les grands foyers.",
     composition: ["Viande de bœuf", "Poulet", "Mouton", "Abats"],
-    image: boxDecouverte,
+    image: boxConviviale,
   },
   {
     name: "Box Festin",
     weight: "20 kg",
     description: "Le choix économique.",
     composition: ["Viande de bœuf", "Poulet", "Mouton", "Abats"],
-    image: boxFamily,
+    image: boxFestin,
   },
 ];
 
