@@ -19,8 +19,8 @@
  */
 
 @theme inline {
-  --font-sans: "DM Sans", sans-serif;
-  --font-display: "Manrope", sans-serif;
+  --font-sans: "Poppins", sans-serif;
+  --font-display: "Montserrat", sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -77,22 +77,22 @@
   --card-foreground: oklch(0.23 0.048 48);
   --popover: oklch(0.995 0.006 78);
   --popover-foreground: oklch(0.23 0.048 48);
-  --primary: oklch(0.48 0.175 31);
+  --primary: oklch(0.56 0.2 27);
   --primary-foreground: oklch(0.985 0.012 77);
-  --secondary: oklch(0.74 0.14 58);
+  --secondary: oklch(0.74 0.18 58);
   --secondary-foreground: oklch(0.23 0.048 48);
   --muted: oklch(0.94 0.025 78);
   --muted-foreground: oklch(0.47 0.035 53);
-  --accent: oklch(0.82 0.15 78);
+  --accent: oklch(0.85 0.17 85);
   --accent-foreground: oklch(0.23 0.048 48);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
   --border: oklch(0.86 0.035 70);
   --input: oklch(0.86 0.035 70);
   --ring: oklch(0.57 0.17 38);
-  --brown: oklch(0.255 0.052 47);
+  --brown: oklch(0.33 0.06 45);
   --cream: oklch(0.965 0.027 79);
-  --gold: oklch(0.82 0.15 78);
+  --gold: oklch(0.85 0.17 85);
   --sun: oklch(0.925 0.105 83);
   --whatsapp: oklch(0.67 0.19 147);
   --whatsapp-foreground: oklch(1 0 0);

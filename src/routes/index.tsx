@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowDown, ArrowRight, BadgeCheck, Beef, CheckCircle2, Clock3, Handshake, MapPin, MessageCircle, PackageCheck, ShieldCheck, Sparkles, Truck } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import heroImage from "@/assets/djawan-hero.jpg";
 import storyImage from "@/assets/djawan-story.jpg";
 import { Header } from "@/components/site/Header";
@@ -42,8 +42,8 @@ function Index() {
               <h1 className="font-display max-w-2xl text-5xl leading-[0.96] font-black sm:text-7xl lg:text-[5.5rem]">La viande fraîche à portée de main.</h1>
               <p className="mt-7 max-w-xl text-base leading-7 text-cream/80 sm:text-lg">Djawan Sahel Meat, c'est des viandes de qualité, des box adaptées à vos besoins et une livraison à domicile à Bamako.</p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer"><MessageCircle size={19} /> Commander sur WhatsApp</Button>
-                <Button href="#box" variant="light">Découvrir nos box <ArrowDown size={18} /></Button>
+                <Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer">Commander sur WhatsApp</Button>
+                <Button href="#box" variant="light">Découvrir nos box</Button>
               </div>
             </div>
           </div>
@@ -52,10 +52,10 @@ function Index() {
 
         <section className="border-b border-border bg-cream px-5 py-10 lg:px-8">
           <div className="mx-auto grid max-w-7xl gap-7 sm:grid-cols-2 lg:grid-cols-4">
-            <FeatureCard icon={Beef} title="Viande fraîche" text="Des produits sélectionnés avec attention." />
-            <FeatureCard icon={BadgeCheck} title="Qualité" text="Une attention portée à la qualité." />
-            <FeatureCard icon={Truck} title="Livraison" text="Bamako et environs." />
-            <FeatureCard icon={MessageCircle} title="Commande simple" text="Directement sur WhatsApp." />
+            <FeatureCard index={1} title="Viande fraîche" text="Des produits sélectionnés avec attention." />
+            <FeatureCard index={2} title="Qualité" text="Une attention portée à la qualité." />
+            <FeatureCard index={3} title="Livraison" text="Bamako et environs." />
+            <FeatureCard index={4} title="Commande simple" text="Directement sur WhatsApp." />
           </div>
         </section>
 
@@ -79,10 +79,10 @@ function Index() {
           <div className="mx-auto max-w-7xl">
             <Reveal><SectionTitle eyebrow="Pourquoi Djawan ?" title="Le bon choix, à chaque étape." light /></Reveal>
             <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              <FeatureCard dark icon={Sparkles} title="Fraîcheur" text="Des viandes sélectionnées avec attention." />
-              <FeatureCard dark icon={ShieldCheck} title="Qualité" text="Une attention portée à la qualité des produits." />
-              <FeatureCard dark icon={Truck} title="Livraison" text="Vos commandes livrées à Bamako et environs." />
-              <FeatureCard dark icon={Handshake} title="Confiance" text="Un service pensé pour construire une relation durable." />
+              <FeatureCard dark index={1} title="Fraîcheur" text="Des viandes sélectionnées avec attention." />
+              <FeatureCard dark index={2} title="Qualité" text="Une attention portée à la qualité des produits." />
+              <FeatureCard dark index={3} title="Livraison" text="Vos commandes livrées à Bamako et environs." />
+              <FeatureCard dark index={4} title="Confiance" text="Un service pensé pour construire une relation durable." />
             </div>
           </div>
         </section>
@@ -91,9 +91,9 @@ function Index() {
           <div className="mx-auto max-w-7xl">
             <Reveal><SectionTitle eyebrow="Comment ça marche ?" title="Commander, c'est aussi simple que ça." centered /></Reveal>
             <div className="relative mt-16 grid gap-10 md:grid-cols-3">
-              {[{n:"01",t:"Choisissez votre box",d:"5 kg, 10 kg, 15 kg ou 20 kg.",i:PackageCheck},{n:"02",t:"Commandez sur WhatsApp",d:"Envoyez votre demande directement à Djawan Sahel Meat.",i:MessageCircle},{n:"03",t:"Recevez votre commande",d:"Votre box est livrée à Bamako et environs.",i:Truck}].map((step, index) => <Reveal key={step.n} delay={index*100}><div className="text-center"><div className="mx-auto grid size-20 place-items-center rounded-full bg-gold text-brown"><step.i size={28} /></div><p className="mt-6 text-xs font-black tracking-[0.18em] text-primary">{step.n}</p><h3 className="mt-2 font-display text-2xl font-bold text-brown">{step.t}</h3><p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-muted-foreground">{step.d}</p></div></Reveal>)}
+              {[{n:"01",t:"Choisissez votre box",d:"5 kg, 10 kg, 15 kg ou 20 kg."},{n:"02",t:"Commandez sur WhatsApp",d:"Envoyez votre demande directement à Djawan Sahel Meat."},{n:"03",t:"Recevez votre commande",d:"Votre box est livrée à Bamako et environs."}].map((step, index) => <Reveal key={step.n} delay={index*100}><div className="text-center"><p className="font-display text-6xl font-black text-secondary">{step.n}</p><h3 className="mt-2 font-display text-2xl font-bold text-brown">{step.t}</h3><p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-muted-foreground">{step.d}</p></div></Reveal>)}
             </div>
-            <div className="mt-12 text-center"><Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer">Commander maintenant <ArrowRight size={18} /></Button></div>
+            <div className="mt-12 text-center"><Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer">Commander maintenant</Button></div>
           </div>
         </section>
 
@@ -106,7 +106,7 @@ function Index() {
                   {["Choisissez votre box", "Payez en 3 tranches", "Sur 28 jours"].map((item, index) => <div key={item} className="credit-step border-l border-gold/60 pl-4"><span className="text-xs font-black text-gold">0{index+1}</span><p className="mt-2 font-display text-xl font-bold">{item}</p></div>)}
                 </div>
                 <p className="my-8 border-y border-cream/15 py-5 text-sm font-bold tracking-[0.12em] text-gold">5 KG • 10 KG • 15 KG • 20 KG</p>
-                <Button variant="light" href={whatsappUrl("Bonjour Djawan Sahel Meat, je souhaite en savoir plus sur l’Avatar Crédit.")} target="_blank" rel="noreferrer">Découvrir l'Avatar Crédit <ArrowRight size={18} /></Button>
+                <Button variant="light" href={whatsappUrl("Bonjour Djawan Sahel Meat, je souhaite en savoir plus sur l’Avatar Crédit.")} target="_blank" rel="noreferrer">Découvrir l'Avatar Crédit</Button>
                 <p className="mt-5 text-xs text-cream/50">Conditions officielles détaillées à venir.</p>
               </div>
             </Reveal>
@@ -127,7 +127,7 @@ function Index() {
         </section>
 
         <section className="bg-primary px-5 py-20 text-center text-primary-foreground lg:px-8">
-          <Reveal><div className="mx-auto max-w-3xl"><CheckCircle2 className="mx-auto text-gold" size={36} /><h2 className="mt-6 font-display text-4xl font-black sm:text-5xl">Prêt à commander votre box ?</h2><p className="mt-5 text-primary-foreground/75">Votre viande fraîche vous attend. Commandez directement sur WhatsApp.</p><Button variant="light" href={defaultWhatsappUrl} target="_blank" rel="noreferrer" className="mt-8"><MessageCircle size={19} /> Commander sur WhatsApp</Button></div></Reveal>
+          <Reveal><div className="mx-auto max-w-3xl"><h2 className="font-display text-4xl font-black sm:text-5xl">Prêt à commander votre box ?</h2><p className="mt-5 text-primary-foreground/75">Votre viande fraîche vous attend. Commandez directement sur WhatsApp.</p><Button variant="light" href={defaultWhatsappUrl} target="_blank" rel="noreferrer" className="mt-8">Commander sur WhatsApp</Button></div></Reveal>
         </section>
       </main>
       <Footer />
