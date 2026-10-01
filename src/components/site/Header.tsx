@@ -1,13 +1,13 @@
-import { Menu, MessageCircle, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./Button";
 import { defaultWhatsappUrl, navItems } from "@/data/djawan";
-import logoAsset from "@/assets/djawan-logo.png.asset.json";
+import logo from "@/assets/djawan-logo.png";
 
 export function Brand({ light = false }: { light?: boolean }) {
   return (
     <a href="#accueil" aria-label="Djawan Sahel Meat — Accueil" className="block shrink-0">
-      <img src={logoAsset.url} alt="Djawan Sahel Meat" width={768} height={768} className={light ? "h-16 w-auto rounded-sm bg-cream object-contain" : "h-16 w-auto object-contain"} />
+      <img src={logo} alt="Djawan Sahel Meat" width={983} height={965} className="h-16 w-auto object-contain" />
     </a>
   );
 }
@@ -22,7 +22,7 @@ export function Header() {
           {navItems.map((item) => <a key={item.href} href={item.href} className="text-sm font-semibold text-brown/70 transition hover:text-primary">{item.label}</a>)}
         </nav>
         <div className="hidden xl:block">
-          <Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer"><MessageCircle size={18} /> Commander</Button>
+          <Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer">Commander</Button>
         </div>
         <button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} className="grid size-11 place-items-center rounded-md border border-border text-brown xl:hidden">
           {open ? <X /> : <Menu />}
@@ -31,7 +31,7 @@ export function Header() {
       <div className={open ? "mobile-menu is-open xl:hidden" : "mobile-menu xl:hidden"}>
         <nav className="grid gap-1 border-t border-border bg-background px-5 py-4" aria-label="Navigation mobile">
           {navItems.map((item) => <a key={item.href} href={item.href} onClick={() => setOpen(false)} className="rounded-md px-3 py-3 font-semibold text-brown hover:bg-muted">{item.label}</a>)}
-          <Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer" className="mt-2"><MessageCircle size={18} /> Commander sur WhatsApp</Button>
+          <Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer" className="mt-2">Commander sur WhatsApp</Button>
         </nav>
       </div>
     </header>

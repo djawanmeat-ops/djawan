@@ -1,4 +1,4 @@
-import { ArrowUpRight, Check } from "lucide-react";
+
 import { Button } from "./Button";
 import { whatsappUrl } from "@/data/djawan";
 
@@ -18,9 +18,9 @@ export function BoxCard({ box, index }: { box: Box; index: number }) {
           <span className="shrink-0 text-2xl font-black text-primary">{box.weight}</span>
         </div>
         <ul className="my-5 grid grid-cols-2 gap-2 border-y border-border py-4">
-          {box.composition.map((item) => <li key={item} className="flex items-center gap-2 text-sm text-brown/75"><Check size={14} className="shrink-0 text-primary" />{item}</li>)}
+          {box.composition.map((item) => <li key={item} className="border-l-2 border-secondary pl-3 text-sm text-brown/75">{item}</li>)}
         </ul>
-        <Button href={url} target="_blank" rel="noreferrer" className="w-full">Commander cette box <ArrowUpRight size={17} /></Button>
+        <Button href={url} target="_blank" rel="noreferrer" className="w-full">Commander cette box</Button>
       </div>
     </article>
   );
