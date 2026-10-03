@@ -1,6 +1,7 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./Button";
+import { CartButton } from "./CartDrawer";
 import { defaultWhatsappUrl, navItems } from "@/data/djawan";
 import logo from "@/assets/djawan-logo.png";
 
@@ -21,12 +22,15 @@ export function Header() {
         <nav aria-label="Navigation principale" className="hidden items-center gap-5 xl:flex">
           {navItems.map((item) => <a key={item.href} href={item.href} className="text-sm font-semibold text-brown/70 transition hover:text-primary">{item.label}</a>)}
         </nav>
-        <div className="hidden xl:block">
-          <Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer">Commander</Button>
+        <div className="flex items-center gap-2">
+          <CartButton />
+          <div className="hidden xl:block">
+            <Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer">Commander</Button>
+          </div>
+          <button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} className="grid size-11 place-items-center rounded-md border border-border text-brown xl:hidden">
+            {open ? <X /> : <Menu />}
+          </button>
         </div>
-        <button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} className="grid size-11 place-items-center rounded-md border border-border text-brown xl:hidden">
-          {open ? <X /> : <Menu />}
-        </button>
       </div>
       <div className={open ? "mobile-menu is-open xl:hidden" : "mobile-menu xl:hidden"}>
         <nav className="grid gap-1 border-t border-border bg-background px-5 py-4" aria-label="Navigation mobile">
