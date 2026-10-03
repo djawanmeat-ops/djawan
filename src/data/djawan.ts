@@ -1,7 +1,18 @@
-import boxDecouverte from "@/assets/box-decouverte.jpg";
-import boxFamily from "@/assets/box-family.jpg";
-import boxConviviale from "@/assets/box-conviviale.jpg";
-import boxFestin from "@/assets/box-festin.jpg";
+import hachee from "@/assets/meat-hachee.jpg";
+import sansGraisse from "@/assets/meat-sans-graisse.jpg";
+import beefSteak from "@/assets/meat-beef-steak.jpg";
+import coteBoeuf from "@/assets/meat-cote-boeuf.jpg";
+import avecOs from "@/assets/meat-avec-os.jpg";
+import foieCoeur from "@/assets/meat-foie-coeur.jpg";
+import rognon from "@/assets/meat-rognon.jpg";
+import os from "@/assets/meat-os.jpg";
+import mouton from "@/assets/meat-mouton.jpg";
+import filet from "@/assets/meat-filet.jpg";
+import pouletEntier from "@/assets/meat-poulet-entier.jpg";
+import blancPoulet from "@/assets/meat-blanc-poulet.jpg";
+import cuissePoulet from "@/assets/meat-cuisse-poulet.jpg";
+import ailePoulet from "@/assets/meat-aile-poulet.jpg";
+import melange from "@/assets/meat-melange.jpg";
 
 export const navItems = [
   { label: "Accueil", href: "#accueil" },
@@ -12,36 +23,58 @@ export const navItems = [
   { label: "FAQ", href: "#faq" },
 ];
 
-export const boxes = [
-  {
-    name: "Box Découverte",
-    weight: "5 kg",
-    description: "Idéal pour 1 à 2 personnes.",
-    composition: ["Viande de bœuf", "Poulet", "Mouton", "Abats"],
-    image: boxDecouverte,
-  },
-  {
-    name: "Box Family",
-    weight: "10 kg",
-    description: "Parfait pour une famille.",
-    composition: ["Viande de bœuf", "Poulet", "Mouton", "Abats"],
-    image: boxFamily,
-  },
-  {
-    name: "Box Conviviale",
-    weight: "15 kg",
-    description: "Pour les grands foyers.",
-    composition: ["Viande de bœuf", "Poulet", "Mouton", "Abats"],
-    image: boxConviviale,
-  },
-  {
-    name: "Box Festin",
-    weight: "20 kg",
-    description: "Le choix économique.",
-    composition: ["Viande de bœuf", "Poulet", "Mouton", "Abats"],
-    image: boxFestin,
-  },
+export type Category = "boeuf" | "mouton" | "abats" | "poulet";
+
+export const categories: { id: Category | "tout" | "melange"; label: string }[] = [
+  { id: "tout", label: "Tout" },
+  { id: "boeuf", label: "Bœuf" },
+  { id: "mouton", label: "Mouton" },
+  { id: "abats", label: "Abats et os" },
+  { id: "poulet", label: "Poulet" },
+  { id: "melange", label: "Mélange" },
 ];
+
+export type Meat = { id: string; name: string; category: Category; pricePerKg: number; image: string };
+
+/** Prix au kg — grille officielle Djawan Meat. */
+export const meats: Meat[] = [
+  { id: "hachee", name: "Viande hachée", category: "boeuf", pricePerKg: 6000, image: hachee },
+  { id: "sans-graisse", name: "Viande sans graisse", category: "boeuf", pricePerKg: 6500, image: sansGraisse },
+  { id: "beef-steak", name: "Beef steak", category: "boeuf", pricePerKg: 6500, image: beefSteak },
+  { id: "cote-boeuf", name: "Côte de bœuf", category: "boeuf", pricePerKg: 9000, image: coteBoeuf },
+  { id: "avec-os", name: "Viande avec os", category: "boeuf", pricePerKg: 5500, image: avecOs },
+  { id: "filet-boeuf", name: "Filet de bœuf", category: "boeuf", pricePerKg: 9000, image: filet },
+  { id: "mouton", name: "Viande de mouton", category: "mouton", pricePerKg: 6000, image: mouton },
+  { id: "foie-coeur", name: "Foie et cœur", category: "abats", pricePerKg: 5000, image: foieCoeur },
+  { id: "rognon", name: "Rognon", category: "abats", pricePerKg: 2500, image: rognon },
+  { id: "os", name: "Os de viande", category: "abats", pricePerKg: 1000, image: os },
+  { id: "poulet-entier", name: "Poulet entier", category: "poulet", pricePerKg: 5000, image: pouletEntier },
+  { id: "blanc-poulet", name: "Blanc de poulet", category: "poulet", pricePerKg: 7500, image: blancPoulet },
+  { id: "cuisse-poulet", name: "Cuisse de poulet", category: "poulet", pricePerKg: 4500, image: cuissePoulet },
+  { id: "aile-poulet", name: "Aile de poulet", category: "poulet", pricePerKg: 4500, image: ailePoulet },
+];
+
+export const melangeImage = melange;
+
+export const formats = [
+  { id: "decouverte", name: "Découverte", kg: 5 },
+  { id: "familiale", name: "Familiale", kg: 10 },
+  { id: "conviviale", name: "Conviviale", kg: 15 },
+  { id: "festive", name: "Festive", kg: 20 },
+] as const;
+
+export type FormatId = (typeof formats)[number]["id"];
+
+export const getFormat = (id: FormatId) => formats.find((f) => f.id === id)!;
+export const getMeat = (id: string) => meats.find((m) => m.id === id);
+
+export const formatFCFA = (value: number) =>
+  `${value.toLocaleString("fr-FR").replace(/\u202f|\u00a0/g, " ")} FCFA`;
+
+export const boxPrice = (meat: Meat, formatId: FormatId) => meat.pricePerKg * getFormat(formatId).kg;
+
+export const mixPrice = (composition: Record<string, number>) =>
+  Object.entries(composition).reduce((sum, [id, kg]) => sum + (getMeat(id)?.pricePerKg ?? 0) * kg, 0);
 
 export function whatsappUrl(message: string) {
   return `https://wa.me/?text=${encodeURIComponent(message)}`;
@@ -54,12 +87,12 @@ export const defaultWhatsappUrl = whatsappUrl(
 export const faqs = [
   {
     question: "Quels sont les formats disponibles ?",
-    answer: "Nos box sont proposées en quatre formats : 5 kg, 10 kg, 15 kg et 20 kg.",
+    answer: "Nos box sont proposées en quatre formats : Découverte 5 kg, Familiale 10 kg, Conviviale 15 kg et Festive 20 kg.",
     pending: false,
   },
   {
     question: "Que contient chaque box ?",
-    answer: "Chaque box est composée de viande de bœuf, de poulet, de mouton et d’abats.",
+    answer: "Chaque box contient un seul type de viande, au choix parmi notre catalogue. La Box Mélange vous permet de composer vous-même votre box, kilo par kilo.",
     pending: false,
   },
   {
@@ -69,7 +102,7 @@ export const faqs = [
   },
   {
     question: "Comment commander ?",
-    answer: "Choisissez votre box puis envoyez votre demande directement à Djawan Sahel Meat sur WhatsApp.",
+    answer: "Ajoutez vos box au panier, puis validez : votre commande est envoyée directement à Djawan Sahel Meat sur WhatsApp.",
     pending: false,
   },
   {
