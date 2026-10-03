@@ -62,8 +62,8 @@ function Index() {
         <section id="box" className="scroll-mt-20 px-5 py-24 lg:px-8 lg:py-32">
           <div className="mx-auto max-w-7xl">
             <Reveal><SectionTitle eyebrow="Nos box" title="Des box adaptées à vos besoins." text="Choisissez le format qui vous convient et profitez de viandes fraîches et de qualité, livrées chez vous." /></Reveal>
-            <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-              {boxes.map((box, index) => <Reveal key={box.name} delay={index * 90}><BoxCard box={box} index={index} /></Reveal>)}
+            <div>
+              <Catalogue />
             </div>
           </div>
         </section>
