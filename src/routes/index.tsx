@@ -7,10 +7,12 @@ import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/site/Button";
 import { SectionTitle } from "@/components/site/SectionTitle";
 import { FeatureCard } from "@/components/site/FeatureCard";
-import { BoxCard } from "@/components/site/BoxCard";
 import { FAQItem } from "@/components/site/FAQItem";
 import { Reveal } from "@/components/site/Reveal";
-import { boxes, defaultWhatsappUrl, faqs, whatsappUrl } from "@/data/djawan";
+import { Catalogue } from "@/components/site/Catalogue";
+import { CartProvider } from "@/components/site/cart";
+import { CartDrawer } from "@/components/site/CartDrawer";
+import { defaultWhatsappUrl, faqs, whatsappUrl } from "@/data/djawan";
 
 export const Route = createFileRoute("/")({
   head: () => ({
