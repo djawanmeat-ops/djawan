@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="overflow-x-clip bg-background">
+    <CartProvider><div className="overflow-x-clip bg-background">
       <Header />
       <main>
         <section id="accueil" className="relative min-h-[92svh] overflow-hidden bg-brown pt-20 text-cream">
@@ -41,11 +41,11 @@ function Index() {
           <div className="relative mx-auto flex min-h-[calc(92svh-5rem)] max-w-7xl items-center px-5 py-16 lg:px-8">
             <div className="hero-enter max-w-3xl">
               <p className="mb-6 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-gold"><span className="h-px w-10 bg-gold" />Bamako & environs</p>
-              <h1 className="font-display max-w-2xl text-5xl leading-[0.96] font-black sm:text-7xl lg:text-[5.5rem]">La viande fraîche à portée de main.</h1>
-              <p className="mt-7 max-w-xl text-base leading-7 text-cream/80 sm:text-lg">Djawan Sahel Meat, c'est des viandes de qualité, des box adaptées à vos besoins et une livraison à domicile à Bamako.</p>
+              <h1 className="font-display max-w-2xl text-5xl leading-[0.96] font-black sm:text-7xl lg:text-[5.5rem]">L'excellence de la viande, livrée chez vous.</h1>
+              <p className="mt-7 max-w-xl text-base leading-7 text-cream/80 sm:text-lg">Des pièces choisies une à une, conditionnées sous vide et réunies dans nos box signature. Livrées à domicile, à Bamako et environs.</p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer">Commander sur WhatsApp</Button>
-                <Button href="#box" variant="light">Découvrir nos box</Button>
+                <Button href="#box" variant="light">Découvrir la sélection</Button>
               </div>
             </div>
           </div>
@@ -63,7 +63,7 @@ function Index() {
 
         <section id="box" className="scroll-mt-20 px-5 py-24 lg:px-8 lg:py-32">
           <div className="mx-auto max-w-7xl">
-            <Reveal><SectionTitle eyebrow="Nos box" title="Des box adaptées à vos besoins." text="Choisissez le format qui vous convient et profitez de viandes fraîches et de qualité, livrées chez vous." /></Reveal>
+            <Reveal><SectionTitle eyebrow="La sélection" title="Nos box, pièce par pièce." text="Quatorze viandes, quatre formats. Chaque box est préparée et conditionnée sous vide pour préserver toute sa fraîcheur." /></Reveal>
             <div>
               <Catalogue />
             </div>
@@ -73,13 +73,13 @@ function Index() {
         <section id="apropos" className="scroll-mt-20 bg-cream px-5 py-24 lg:px-8 lg:py-32">
           <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
             <Reveal><div className="overflow-hidden rounded-lg"><img src={storyImage} alt="Préparation attentive de viande fraîche chez Djawan Sahel Meat" width={1408} height={1008} loading="lazy" className="aspect-[4/3] h-full w-full object-cover" /></div></Reveal>
-            <Reveal><SectionTitle eyebrow="Notre histoire" title="Plus qu'une viande, une expérience de confiance." text="Djawan Sahel Meat propose des viandes sélectionnées avec attention et des box adaptées aux différents besoins des foyers. Notre engagement repose sur la fraîcheur, la qualité, le service et la satisfaction de nos clients." /></Reveal>
+            <Reveal><SectionTitle eyebrow="Notre histoire" title="L'art de bien choisir, le soin de bien servir." text="Chez Djawan Sahel Meat, chaque pièce est sélectionnée avec exigence, puis conditionnée avec soin. Notre maison repose sur trois valeurs : la fraîcheur, la qualité et la confiance que nous accordent les familles de Bamako." /></Reveal>
           </div>
         </section>
 
         <section className="bg-brown px-5 py-24 lg:px-8 lg:py-28">
           <div className="mx-auto max-w-7xl">
-            <Reveal><SectionTitle eyebrow="Pourquoi Djawan ?" title="Le bon choix, à chaque étape." light /></Reveal>
+            <Reveal><SectionTitle eyebrow="Pourquoi Djawan ?" title="L'exigence, à chaque étape." light /></Reveal>
             <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               <FeatureCard dark index={1} title="Fraîcheur" text="Des viandes sélectionnées avec attention." />
               <FeatureCard dark index={2} title="Qualité" text="Une attention portée à la qualité des produits." />
@@ -91,7 +91,7 @@ function Index() {
 
         <section id="commande" className="scroll-mt-20 px-5 py-24 lg:px-8 lg:py-32">
           <div className="mx-auto max-w-7xl">
-            <Reveal><SectionTitle eyebrow="Comment ça marche ?" title="Commander, c'est aussi simple que ça." centered /></Reveal>
+            <Reveal><SectionTitle eyebrow="Comment ça marche ?" title="Trois gestes, et c'est servi." centered /></Reveal>
             <div className="relative mt-16 grid gap-10 md:grid-cols-3">
               {[{n:"01",t:"Choisissez votre box",d:"5 kg, 10 kg, 15 kg ou 20 kg."},{n:"02",t:"Commandez sur WhatsApp",d:"Envoyez votre demande directement à Djawan Sahel Meat."},{n:"03",t:"Recevez votre commande",d:"Votre box est livrée à Bamako et environs."}].map((step, index) => <Reveal key={step.n} delay={index*100}><div className="text-center"><p className="font-display text-6xl font-black text-secondary">{step.n}</p><h3 className="mt-2 font-display text-2xl font-bold text-brown">{step.t}</h3><p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-muted-foreground">{step.d}</p></div></Reveal>)}
             </div>
@@ -118,7 +118,7 @@ function Index() {
         <section className="relative min-h-[620px] overflow-hidden bg-brown px-5 py-24 text-cream lg:px-8 lg:py-32">
           <img src={heroImage} alt="Viandes fraîches sélectionnées avec soin" width={1600} height={1104} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-right" />
           <div className="absolute inset-0 bg-commitment-overlay" />
-          <Reveal className="relative mx-auto max-w-7xl"><p className="text-xs font-black uppercase tracking-[0.2em] text-gold">Nos engagements</p><h2 className="mt-8 max-w-3xl font-display text-5xl leading-[1.05] font-black sm:text-7xl">La fraîcheur.<br />La qualité.<br />La confiance.</h2><p className="mt-8 max-w-lg leading-7 text-cream/75">Trois piliers pour vous proposer une expérience simple, soignée et fidèle à vos attentes.</p></Reveal>
+          <Reveal className="relative mx-auto max-w-7xl"><p className="text-xs font-black uppercase tracking-[0.2em] text-gold">Nos engagements</p><h2 className="mt-8 max-w-3xl font-display text-5xl leading-[1.05] font-black sm:text-7xl">La fraîcheur.<br />La qualité.<br />La confiance.</h2><p className="mt-8 max-w-lg leading-7 text-cream/75">Trois piliers qui guident chacune de nos box, de la sélection jusqu'à votre table.</p></Reveal>
         </section>
 
         <section id="faq" className="scroll-mt-20 bg-cream px-5 py-24 lg:px-8 lg:py-32">
@@ -129,11 +129,12 @@ function Index() {
         </section>
 
         <section className="bg-primary px-5 py-20 text-center text-primary-foreground lg:px-8">
-          <Reveal><div className="mx-auto max-w-3xl"><h2 className="font-display text-4xl font-black sm:text-5xl">Prêt à commander votre box ?</h2><p className="mt-5 text-primary-foreground/75">Votre viande fraîche vous attend. Commandez directement sur WhatsApp.</p><Button variant="light" href={defaultWhatsappUrl} target="_blank" rel="noreferrer" className="mt-8">Commander sur WhatsApp</Button></div></Reveal>
+          <Reveal><div className="mx-auto max-w-3xl"><h2 className="font-display text-4xl font-black sm:text-5xl">Votre prochaine box vous attend.</h2><p className="mt-5 text-primary-foreground/75">Composez-la en quelques instants et finalisez votre commande sur WhatsApp.</p><Button variant="light" href={defaultWhatsappUrl} target="_blank" rel="noreferrer" className="mt-8">Commander sur WhatsApp</Button></div></Reveal>
         </section>
       </main>
       <Footer />
       <a href={defaultWhatsappUrl} target="_blank" rel="noreferrer" aria-label="Commander sur WhatsApp" className="fixed bottom-5 right-5 z-40 grid size-14 place-items-center rounded-full bg-whatsapp text-whatsapp-foreground shadow-lg transition hover:scale-105 md:hidden"><MessageCircle size={25} /></a>
-    </div>
+      <CartDrawer />
+    </div></CartProvider>
   );
 }
