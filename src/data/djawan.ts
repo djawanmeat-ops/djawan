@@ -76,8 +76,11 @@ export const boxPrice = (meat: Meat, formatId: FormatId) => meat.pricePerKg * ge
 export const mixPrice = (composition: Record<string, number>) =>
   Object.entries(composition).reduce((sum, [id, kg]) => sum + (getMeat(id)?.pricePerKg ?? 0) * kg, 0);
 
+/** Numéro WhatsApp officiel Djawan Sahel Meat, format international sans « + ». */
+export const WHATSAPP_NUMBER = "22371699120";
+
 export function whatsappUrl(message: string) {
-  return `https://wa.me/?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
 export const defaultWhatsappUrl = whatsappUrl(
