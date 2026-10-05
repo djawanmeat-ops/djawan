@@ -14,7 +14,7 @@ type CartCtx = {
   lines: CartLine[];
   open: boolean;
   setOpen: (v: boolean) => void;
-  add: (line: Omit<CartLine, "key" | "qty">) => void;
+  add: (line: Omit<CartLine, "key" | "qty">, qty?: number) => void;
   setQty: (key: string, qty: number) => void;
   remove: (key: string) => void;
   count: number;
@@ -54,13 +54,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
   useEffect(() => { if (ready) localStorage.setItem(STORAGE, JSON.stringify(lines)); }, [lines, ready]);
 
-  const add: CartCtx["add"] = (line) => {
+  const add: CartCtx["add"] = (line, n = 1) => {
     const key = line.mix
       ? `mix-${line.formatId}-${Object.entries(line.mix).sort().map(([k, v]) => `${k}${v}`).join("")}`
       : `${line.meatId}-${line.formatId}`;
     setLines((prev) => {
       const found = prev.find((l) => l.key === key);
-      return found ? prev.map((l) => (l.key === key ? { ...l, qty: l.qty + 1 } : l)) : [...prev, { ...line, key, qty: 1 }];
+      return found ? prev.map((l) => (l.key === key ? { ...l, qty: l.qty + n } : l)) : [...prev, { ...line, key, qty: n }];
     });
     setOpen(true);
   };
