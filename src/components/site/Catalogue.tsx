@@ -21,6 +21,7 @@ function FormatPicker({ value, onChange }: { value: FormatId; onChange: (f: Form
 
 function ProductCard({ meat }: { meat: Meat }) {
   const [format, setFormat] = useState<FormatId>("decouverte");
+  const [qty, setQty] = useState(1);
   const { add } = useCart();
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card">
@@ -33,11 +34,19 @@ function ProductCard({ meat }: { meat: Meat }) {
           <p className="mt-1 text-sm text-muted-foreground">{formatFCFA(meat.pricePerKg)} / kg</p>
         </div>
         <FormatPicker value={format} onChange={setFormat} />
-        <div className="mt-auto flex items-baseline justify-between border-t border-border pt-4">
-          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Box {getFormat(format).name}</span>
-          <span className="text-xl font-black text-primary">{formatFCFA(boxPrice(meat, format))}</span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Quantité</span>
+          <div className="flex items-center rounded-md border border-border">
+            <button type="button" aria-label="Diminuer la quantité" onClick={() => setQty((q) => Math.max(1, q - 1))} className="h-10 w-10 text-lg font-bold text-brown hover:bg-muted">−</button>
+            <span className="w-10 text-center font-bold text-brown" aria-live="polite">{qty}</span>
+            <button type="button" aria-label="Augmenter la quantité" onClick={() => setQty((q) => q + 1)} className="h-10 w-10 text-lg font-bold text-brown hover:bg-muted">+</button>
+          </div>
         </div>
-        <button type="button" className={btn} onClick={() => add({ meatId: meat.id, formatId: format })}>Ajouter au panier</button>
+        <div className="mt-auto flex items-baseline justify-between border-t border-border pt-4">
+          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{qty} × Box {getFormat(format).name}</span>
+          <span className="text-xl font-black text-primary">{formatFCFA(boxPrice(meat, format) * qty)}</span>
+        </div>
+        <button type="button" className={btn} onClick={() => { add({ meatId: meat.id, formatId: format }, qty); setQty(1); }}>Ajouter au panier</button>
       </div>
     </article>
   );
