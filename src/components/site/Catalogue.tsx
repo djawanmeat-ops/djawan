@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { boxPrice, categories, formatFCFA, formats, getFormat, melangeImage, meats, mixPrice, type FormatId, type Meat } from "@/data/djawan";
+import { boxPrice, categories, cutOptions, formatFCFA, formats, getFormat, melangeImage, meats, mixPrice, type FormatId, type Meat } from "@/data/djawan";
 import { useCart } from "./cart";
 
 const btn = "inline-flex min-h-12 w-full items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40";
@@ -19,9 +19,21 @@ function FormatPicker({ value, onChange }: { value: FormatId; onChange: (f: Form
   );
 }
 
+export function CutPicker({ value, onChange }: { value: string; onChange: (c: string) => void }) {
+  return (
+    <label className="flex items-center justify-between gap-3">
+      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Découpe</span>
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="h-10 min-w-0 flex-1 rounded-md border border-border bg-background px-2 text-sm font-semibold text-brown sm:max-w-[60%]">
+        {cutOptions.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+      </select>
+    </label>
+  );
+}
+
 function ProductCard({ meat }: { meat: Meat }) {
   const [format, setFormat] = useState<FormatId>("decouverte");
   const [qty, setQty] = useState(1);
+  const [cut, setCut] = useState("aucune");
   const { add } = useCart();
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card">
@@ -34,6 +46,7 @@ function ProductCard({ meat }: { meat: Meat }) {
           <p className="mt-1 text-sm text-muted-foreground">{formatFCFA(meat.pricePerKg)} / kg</p>
         </div>
         <FormatPicker value={format} onChange={setFormat} />
+        <CutPicker value={cut} onChange={setCut} />
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Quantité</span>
           <div className="flex items-center rounded-md border border-border">
@@ -46,7 +59,7 @@ function ProductCard({ meat }: { meat: Meat }) {
           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{qty} × Box {getFormat(format).name}</span>
           <span className="text-xl font-black text-primary">{formatFCFA(boxPrice(meat, format) * qty)}</span>
         </div>
-        <button type="button" className={btn} onClick={() => { add({ meatId: meat.id, formatId: format }, qty); setQty(1); }}>Ajouter au panier</button>
+        <button type="button" className={btn} onClick={() => { add({ meatId: meat.id, formatId: format, cut }, qty); setQty(1); }}>Ajouter au panier</button>
       </div>
     </article>
   );
@@ -55,6 +68,7 @@ function ProductCard({ meat }: { meat: Meat }) {
 function MixBuilder() {
   const [format, setFormat] = useState<FormatId>("decouverte");
   const [mix, setMix] = useState<Record<string, number>>({});
+  const [cut, setCut] = useState("aucune");
   const { add } = useCart();
   const target = getFormat(format).kg;
   const used = Object.values(mix).reduce((a, b) => a + b, 0);
@@ -92,11 +106,12 @@ function MixBuilder() {
             </li>
           ))}
         </ul>
+        <div className="mt-5"><CutPicker value={cut} onChange={setCut} /></div>
         <div className="mt-5 flex items-baseline justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total</span>
           <span className="text-2xl font-black text-primary">{formatFCFA(mixPrice(mix))}</span>
         </div>
-        <button type="button" className={cn(btn, "mt-4")} disabled={used !== target} onClick={() => { add({ formatId: format, mix }); setMix({}); }}>
+        <button type="button" className={cn(btn, "mt-4")} disabled={used !== target} onClick={() => { add({ formatId: format, mix, cut }); setMix({}); }}>
           {used === target ? "Ajouter au panier" : `Complétez jusqu'à ${target} kg`}
         </button>
       </div>
