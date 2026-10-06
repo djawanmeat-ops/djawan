@@ -7,7 +7,7 @@ import logo from "@/assets/djawan-logo.png";
 
 export function Brand({ light = false }: { light?: boolean }) {
   return (
-    <a href="#accueil" aria-label="Djawan Sahel Meat — Accueil" className="block shrink-0">
+    <a href="/#accueil" aria-label="Djawan Sahel Meat — Accueil" className="block shrink-0">
       <img src={logo} alt="Djawan Sahel Meat" width={983} height={965} className="h-16 w-auto object-contain" />
     </a>
   );
