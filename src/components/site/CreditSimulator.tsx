@@ -12,7 +12,7 @@ function split(total: number) {
 export function CreditSimulator() {
   const { total: cartTotal } = useCart();
   const [mode, setMode] = useState<"box" | "panier">("box");
-  const [meatId, setMeatId] = useState(meats[0].id);
+  const [meatId, setMeatId] = useState(meats[0]!.id);
   const [format, setFormat] = useState<FormatId>("familiale");
   const meat = getMeat(meatId)!;
   const total = mode === "panier" ? cartTotal : boxPrice(meat, format);
@@ -49,7 +49,7 @@ export function CreditSimulator() {
         {["Jour 0", "Jour 14", "Jour 28"].map((d, i) => (
           <li key={d} className="credit-step border-l border-gold/60 pl-4">
             <span className="text-xs font-black text-gold">Tranche {i + 1} · {d}</span>
-            <p className="mt-2 font-display text-xl font-bold">{formatFCFA(parts[i])}</p>
+            <p className="mt-2 font-display text-xl font-bold">{formatFCFA(parts[i] ?? 0)}</p>
           </li>
         ))}
       </ol>
