@@ -9,5 +9,7 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep the marketing site as one anchored landing page because the requested conversion journey is intentionally continuous.
+- Keep the marketing site as one anchored landing page (nav links use `/#anchor`); the only separate page is `/promo`, because promotions open and close on their own schedule.
+- Compute festival promo windows client-side from the Hijri calendar (`src/lib/promo.ts`) because dates move every year and must update without manual edits.
+- AI cut recommendations run in a server function (`src/lib/advisor.functions.ts`) so the gateway key never reaches the browser.
 - Store product-box content in `src/data/djawan.ts` so commercial content remains editable independently from presentation.

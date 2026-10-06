@@ -15,12 +15,45 @@ import ailePoulet from "@/assets/meat-aile-poulet.jpg";
 import melange from "@/assets/meat-melange.jpg";
 
 export const navItems = [
-  { label: "Accueil", href: "#accueil" },
-  { label: "Nos Box", href: "#box" },
-  { label: "À propos", href: "#apropos" },
-  { label: "Comment ça marche", href: "#commande" },
-  { label: "Avatar Crédit", href: "#credit" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Accueil", href: "/#accueil" },
+  { label: "Nos Box", href: "/#box" },
+  { label: "Promo", href: "/promo" },
+  { label: "À propos", href: "/#apropos" },
+  { label: "Comment ça marche", href: "/#commande" },
+  { label: "Avatar Crédit", href: "/#credit" },
+  { label: "FAQ", href: "/#faq" },
+];
+
+/** Préférences de découpe proposées sur chaque article. */
+export const cutOptions = [
+  { id: "aucune", label: "Sans préférence" },
+  { id: "des", label: "En dés pour sauce" },
+  { id: "grosses", label: "Grosses pièces" },
+  { id: "soupe", label: "Morceaux pour soupe" },
+  { id: "tranches", label: "Tranches fines" },
+] as const;
+export type CutId = (typeof cutOptions)[number]["id"];
+export const getCut = (id?: string) => cutOptions.find((c) => c.id === id);
+
+/**
+ * Promotions. `offer` : texte de l'offre officielle — laisser vide tant qu'elle n'est pas validée
+ * (le site affiche alors « Offre dévoilée prochainement »).
+ * Fêtes : jour du calendrier hégirien (mois 1-12, jour). Ouverture 1 mois avant, fermeture 48 h après.
+ */
+export type Promo = {
+  id: string;
+  name: string;
+  tagline: string;
+  offer: string;
+  hijri?: { month: number; day: number; feast: string };
+};
+
+export const promos: Promo[] = [
+  { id: "djawan", name: "Promo Djawan", tagline: "Toute l'année, 12 mois sur 12.", offer: "" },
+  { id: "ramadan", name: "Promo Ramadan", tagline: "Préparez le mois sacré et la Korité.", offer: "", hijri: { month: 10, day: 1, feast: "Aïd el-Fitr" } },
+  { id: "tabaski", name: "Promo Tabaski", tagline: "Pour la grande fête en famille.", offer: "", hijri: { month: 12, day: 10, feast: "Tabaski" } },
+  { id: "maouloud", name: "Promo Maouloud", tagline: "Pour célébrer le Maouloud.", offer: "", hijri: { month: 3, day: 12, feast: "Maouloud" } },
+  { id: "achoura", name: "Promo Achoura", tagline: "Pour le repas de l'Achoura.", offer: "", hijri: { month: 1, day: 10, feast: "Achoura" } },
 ];
 
 export type Category = "boeuf" | "mouton" | "abats" | "poulet";
