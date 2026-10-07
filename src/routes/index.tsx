@@ -12,6 +12,9 @@ import { Reveal } from "@/components/site/Reveal";
 import { Catalogue } from "@/components/site/Catalogue";
 import { CartProvider } from "@/components/site/cart";
 import { CartDrawer } from "@/components/site/CartDrawer";
+import { Advisor } from "@/components/site/Advisor";
+import { CreditSimulator } from "@/components/site/CreditSimulator";
+import { PromoBanner } from "@/components/site/PromoBanner";
 import { defaultWhatsappUrl, faqs, whatsappUrl } from "@/data/djawan";
 
 export const Route = createFileRoute("/")({
@@ -35,6 +38,7 @@ function Index() {
     <CartProvider><div className="overflow-x-clip bg-background">
       <Header />
       <main>
+        <PromoBanner />
         <section id="accueil" className="relative min-h-[92svh] overflow-hidden bg-brown pt-20 text-cream">
           <img src={heroImage} alt="Sélection de viandes fraîches Djawan Sahel Meat" width={1600} height={1104} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-[62%_center]" />
           <div className="absolute inset-0 bg-hero-overlay" />
@@ -67,6 +71,7 @@ function Index() {
             <div>
               <Catalogue />
             </div>
+            <div className="mt-20"><Advisor /></div>
           </div>
         </section>
 
@@ -112,6 +117,7 @@ function Index() {
                 <p className="mt-5 text-xs text-cream/50">Conditions officielles détaillées à venir.</p>
               </div>
             </Reveal>
+            <div className="lg:col-span-2"><CreditSimulator /></div>
           </div>
         </section>
 

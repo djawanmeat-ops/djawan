@@ -9,7 +9,7 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep the marketing site as one anchored landing page (nav links use `/#anchor`); the only separate page is `/promo`, because promotions open and close on their own schedule.
-- Compute festival promo windows client-side from the Hijri calendar (`src/lib/promo.ts`) because dates move every year and must update without manual edits.
+- Keep the marketing site as one anchored landing page (nav links use `/#anchor`); the only separate pages are `/promo`, `/auth` and `/admin`, because promotions and their back-office need their own URLs.
+- Promo activation is stored in the `promos` table and toggled by admins only; the public read goes through `get_public_promos()` so inactive offer text never reaches the browser. Hijri dates (`src/lib/promo.ts`) are only an admin reminder.
 - AI cut recommendations run in a server function (`src/lib/advisor.functions.ts`) so the gateway key never reaches the browser.
 - Store product-box content in `src/data/djawan.ts` so commercial content remains editable independently from presentation.
