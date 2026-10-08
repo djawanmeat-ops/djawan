@@ -31,7 +31,7 @@ export function Advisor() {
           <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={600} placeholder="Ex. Un mafé pour 6 personnes dimanche"
             className="w-full rounded-md border border-border bg-background p-3 text-sm text-brown outline-none focus:border-brown" />
           <div className="mt-3 flex flex-wrap gap-2">
-            {examples.map((ex) => <button key={ex} type="button" onClick={() => { setText(ex); submit(ex); }} className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-brown hover:border-brown/50">{ex}</button>)}
+            {examples.map((ex) => <button key={ex} type="button" onClick={() => { setText(ex); submit(ex); }} className="min-h-10 rounded-full border border-border px-4 py-2 text-xs font-semibold text-brown hover:border-brown/50">{ex}</button>)}
           </div>
           <button type="submit" disabled={loading || text.trim().length < 3} className="mt-5 inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-6 text-sm font-bold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-40">
             {loading ? "Le boucher réfléchit…" : "Obtenir mes conseils"}

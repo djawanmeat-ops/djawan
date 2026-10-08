@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { boxPrice, categories, cutOptions, formatFCFA, formats, getFormat, melangeImage, meats, mixPrice, type FormatId, type Meat } from "@/data/djawan";
 import { useCart } from "./cart";
 
@@ -30,41 +31,83 @@ export function CutPicker({ value, onChange }: { value: string; onChange: (c: st
   );
 }
 
-function ProductCard({ meat }: { meat: Meat }) {
-  const [format, setFormat] = useState<FormatId>("decouverte");
-  const [qty, setQty] = useState(1);
-  const [cut, setCut] = useState("aucune");
-  const [added, setAdded] = useState(false);
-  const { add } = useCart();
+/** Fiche compacte : le choix du format, de la découpe et de la quantité se fait dans ProductDialog. */
+function ProductCard({ meat, onChoose }: { meat: Meat; onChoose: () => void }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card">
-      <div className="aspect-[4/3] overflow-hidden">
+      <button type="button" onClick={onChoose} tabIndex={-1} aria-hidden="true" className="aspect-[4/3] overflow-hidden">
         <img src={meat.image} alt={`Box ${meat.name} — paquets sous vide dans le carton Djawan`} width={800} height={597} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]" />
-      </div>
-      <div className="flex flex-1 flex-col gap-4 p-5">
+      </button>
+      <div className="flex flex-1 flex-col gap-3 p-3 sm:gap-4 sm:p-5">
         <div>
-          <h3 className="font-display text-xl font-bold text-brown">{meat.name}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">{formatFCFA(meat.pricePerKg)} / kg</p>
+          <h3 className="font-display text-base leading-tight font-bold text-brown sm:text-xl">{meat.name}</h3>
+          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">{formatFCFA(meat.pricePerKg)} / kg</p>
         </div>
-        <FormatPicker value={format} onChange={setFormat} />
-        <CutPicker value={cut} onChange={setCut} />
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Quantité</span>
-          <div className="flex items-center rounded-md border border-border">
-            <button type="button" aria-label="Diminuer la quantité" onClick={() => setQty((q) => Math.max(1, q - 1))} className="h-10 w-10 text-lg font-bold text-brown hover:bg-muted">−</button>
-            <span className="w-10 text-center font-bold text-brown" aria-live="polite">{qty}</span>
-            <button type="button" aria-label="Augmenter la quantité" onClick={() => setQty((q) => q + 1)} className="h-10 w-10 text-lg font-bold text-brown hover:bg-muted">+</button>
-          </div>
-        </div>
-        <div className="mt-auto flex items-baseline justify-between border-t border-border pt-4">
-          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{qty} × Box {getFormat(format).name}</span>
-          <span className="text-xl font-black text-primary">{formatFCFA(boxPrice(meat, format) * qty)}</span>
-        </div>
-        <button type="button" className={btn} onClick={() => { add({ meatId: meat.id, formatId: format, cut }, qty); setQty(1); setAdded(true); setTimeout(() => setAdded(false), 1800); }}>
-          {added ? "Ajouté ✓ — ajoutez-en d'autres" : "Ajouter au panier"}
+        <button type="button" className={cn(btn, "mt-auto min-h-11 px-3")} onClick={onChoose} aria-label={`Choisir ${meat.name}`}>
+          Choisir
         </button>
       </div>
     </article>
+  );
+}
+
+function ProductOptions({ meat, onAdded }: { meat: Meat; onAdded: () => void }) {
+  const [format, setFormat] = useState<FormatId>("decouverte");
+  const [qty, setQty] = useState(1);
+  const [cut, setCut] = useState("aucune");
+  const { add } = useCart();
+  return (
+    <div className="grid gap-5">
+      <div className="flex items-center gap-4 pr-8">
+        <img src={meat.image} alt="" width={800} height={597} className="h-20 w-28 shrink-0 rounded-md object-cover sm:h-24 sm:w-32" />
+        <div className="min-w-0">
+          <DialogTitle className="font-display text-2xl font-black text-brown">{meat.name}</DialogTitle>
+          <DialogDescription className="mt-1 text-sm">{formatFCFA(meat.pricePerKg)} / kg</DialogDescription>
+        </div>
+      </div>
+      <FormatPicker value={format} onChange={setFormat} />
+      <CutPicker value={cut} onChange={setCut} />
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Quantité</span>
+        <div className="flex items-center rounded-md border border-border">
+          <button type="button" aria-label="Diminuer la quantité" onClick={() => setQty((q) => Math.max(1, q - 1))} className="h-11 w-11 text-lg font-bold text-brown hover:bg-muted">−</button>
+          <span className="w-10 text-center font-bold text-brown" aria-live="polite">{qty}</span>
+          <button type="button" aria-label="Augmenter la quantité" onClick={() => setQty((q) => q + 1)} className="h-11 w-11 text-lg font-bold text-brown hover:bg-muted">+</button>
+        </div>
+      </div>
+      <div className="flex items-baseline justify-between border-t border-border pt-4">
+        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{qty} × Box {getFormat(format).name}</span>
+        <span className="text-2xl font-black text-primary">{formatFCFA(boxPrice(meat, format) * qty)}</span>
+      </div>
+      <button type="button" className={btn} onClick={() => { add({ meatId: meat.id, formatId: format, cut }, qty); onAdded(); }}>
+        Ajouter au panier
+      </button>
+    </div>
+  );
+}
+
+/** Panneau bas sur mobile, fenêtre centrée à partir de sm. */
+function ProductDialog({ meat, onClose }: { meat: Meat | null; onClose: () => void }) {
+  return (
+    <Dialog open={!!meat} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="top-auto bottom-0 left-0 max-h-[92svh] max-w-none translate-x-0 translate-y-0 overflow-y-auto rounded-t-2xl p-5 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:top-[50%] sm:bottom-auto sm:left-[50%] sm:max-w-md sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:p-7 sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0">
+        {meat && <ProductOptions key={meat.id} meat={meat} onAdded={onClose} />}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function MixTeaser({ onOpen }: { onOpen: () => void }) {
+  return (
+    <div className="grid overflow-hidden rounded-lg border border-border bg-card sm:grid-cols-[0.6fr_1.4fr]">
+      <img src={melangeImage} alt="Box Mélange — plusieurs viandes sous vide dans le carton Djawan" width={800} height={597} loading="lazy" decoding="async" className="aspect-[16/9] h-full w-full object-cover sm:aspect-auto" />
+      <div className="flex flex-col justify-center gap-3 p-5 sm:p-8">
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-secondary">Box Mélange</p>
+        <h3 className="font-display text-2xl font-black text-brown sm:text-3xl">Composez votre box, kilo par kilo.</h3>
+        <p className="text-sm text-muted-foreground">Associez plusieurs viandes dans un même format, jusqu'au poids exact.</p>
+        <button type="button" onClick={onOpen} className={cn(btn, "mt-2 sm:w-auto sm:self-start")}>Composer ma box</button>
+      </div>
+    </div>
   );
 }
 
@@ -102,9 +145,9 @@ function MixBuilder() {
             <li key={m.id} className="flex items-center justify-between gap-3 border-b border-border py-2.5">
               <div className="min-w-0"><p className="truncate text-sm font-semibold text-brown">{m.name}</p><p className="text-xs text-muted-foreground">{formatFCFA(m.pricePerKg)} / kg</p></div>
               <div className="flex shrink-0 items-center gap-2">
-                <button type="button" aria-label={`Retirer 1 kg de ${m.name}`} onClick={() => change(m.id, -1)} disabled={!mix[m.id]} className="size-8 rounded-md border border-border font-bold text-brown disabled:opacity-30">−</button>
+                <button type="button" aria-label={`Retirer 1 kg de ${m.name}`} onClick={() => change(m.id, -1)} disabled={!mix[m.id]} className="size-10 rounded-md border border-border font-bold text-brown disabled:opacity-30">−</button>
                 <span className="w-9 text-center text-sm font-black">{mix[m.id] ?? 0} kg</span>
-                <button type="button" aria-label={`Ajouter 1 kg de ${m.name}`} onClick={() => change(m.id, 1)} disabled={used >= target} className="size-8 rounded-md border border-border font-bold text-brown disabled:opacity-30">+</button>
+                <button type="button" aria-label={`Ajouter 1 kg de ${m.name}`} onClick={() => change(m.id, 1)} disabled={used >= target} className="size-10 rounded-md border border-border font-bold text-brown disabled:opacity-30">+</button>
               </div>
             </li>
           ))}
@@ -124,10 +167,16 @@ function MixBuilder() {
 
 export function Catalogue() {
   const [cat, setCat] = useState<(typeof categories)[number]["id"]>("tout");
+  const [selected, setSelected] = useState<Meat | null>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
   const list = cat === "tout" ? meats : meats.filter((m) => m.category === cat);
+  const openMix = () => {
+    setCat("melange");
+    tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   return (
     <div className="mt-10">
-      <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2" role="tablist" aria-label="Familles de viande">
+      <div ref={tabsRef} className="-mx-5 flex scroll-mt-24 gap-2 overflow-x-auto px-5 pb-2" role="tablist" aria-label="Familles de viande">
         {categories.map((c) => (
           <button key={c.id} type="button" role="tab" aria-selected={cat === c.id} onClick={() => setCat(c.id)}
             className={cn("shrink-0 rounded-full border px-4 py-2 text-sm font-bold transition", cat === c.id ? "border-brown bg-brown text-cream" : "border-border text-brown hover:border-brown/50")}>
@@ -137,12 +186,13 @@ export function Catalogue() {
       </div>
       <div className="mt-8">
         {cat === "melange" ? <MixBuilder /> : (
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-            {list.map((m) => <ProductCard key={m.id} meat={m} />)}
+          <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+            {list.map((m) => <ProductCard key={m.id} meat={m} onChoose={() => setSelected(m)} />)}
           </div>
         )}
       </div>
-      {cat !== "melange" && <div className="mt-10"><MixBuilder /></div>}
+      {cat !== "melange" && <div className="mt-10"><MixTeaser onOpen={openMix} /></div>}
+      <ProductDialog meat={selected} onClose={() => setSelected(null)} />
     </div>
   );
 }

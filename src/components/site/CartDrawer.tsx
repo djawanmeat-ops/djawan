@@ -53,9 +53,9 @@ export function CartDrawer() {
                   {lineCut(l) && <p className="mt-1 text-xs font-semibold text-secondary">Découpe : {lineCut(l)}</p>}
                   <div className="mt-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <button type="button" aria-label="Diminuer" onClick={() => setQty(l.key, l.qty - 1)} className="size-8 rounded-md border border-border font-bold">−</button>
+                      <button type="button" aria-label="Diminuer" onClick={() => setQty(l.key, l.qty - 1)} className="size-10 rounded-md border border-border font-bold">−</button>
                       <span className="w-6 text-center text-sm font-black">{l.qty}</span>
-                      <button type="button" aria-label="Augmenter" onClick={() => setQty(l.key, l.qty + 1)} className="size-8 rounded-md border border-border font-bold">+</button>
+                      <button type="button" aria-label="Augmenter" onClick={() => setQty(l.key, l.qty + 1)} className="size-10 rounded-md border border-border font-bold">+</button>
                     </div>
                     <span className="font-black text-brown">{formatFCFA(linePrice(l))}</span>
                   </div>
