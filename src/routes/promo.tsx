@@ -6,7 +6,7 @@ import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/site/Button";
 import { CartProvider } from "@/components/site/cart";
 import { CartDrawer } from "@/components/site/CartDrawer";
-import { whatsappUrl } from "@/data/djawan";
+import { SITE_URL, shareMeta, whatsappUrl } from "@/data/djawan";
 import { listPublicPromos } from "@/lib/promos.functions";
 
 export const promosQuery = queryOptions({ queryKey: ["promos"], queryFn: () => listPublicPromos() });
@@ -19,8 +19,10 @@ export const Route = createFileRoute("/promo")({
       { property: "og:title", content: "Promotions — Djawan Sahel Meat" },
       { property: "og:description", content: "Promo Djawan, Ramadan, Tabaski, Maouloud et Achoura." },
       { property: "og:type", content: "website" },
+      ...shareMeta("/promo"),
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: `${SITE_URL}/promo` }],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(promosQuery),
   component: PromoPage,

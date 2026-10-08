@@ -15,7 +15,7 @@ import { CartDrawer } from "@/components/site/CartDrawer";
 import { Advisor } from "@/components/site/Advisor";
 import { CreditSimulator } from "@/components/site/CreditSimulator";
 import { PromoBanner } from "@/components/site/PromoBanner";
-import { defaultWhatsappUrl, faqs, whatsappUrl } from "@/data/djawan";
+import { SITE_URL, businessJsonLd, defaultWhatsappUrl, faqs, shareMeta, whatsappUrl } from "@/data/djawan";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,10 +25,11 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Djawan Sahel Meat — Viande fraîche et box à Bamako" },
       { property: "og:description", content: "Des box de viande fraîche, adaptées à vos besoins et livrées à Bamako et environs." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "/" },
+      ...shareMeta("/"),
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(businessJsonLd) }],
   }),
   component: Index,
 });

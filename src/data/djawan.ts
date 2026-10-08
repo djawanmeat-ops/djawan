@@ -109,8 +109,39 @@ export const boxPrice = (meat: Meat, formatId: FormatId) => meat.pricePerKg * ge
 export const mixPrice = (composition: Record<string, number>) =>
   Object.entries(composition).reduce((sum, [id, kg]) => sum + (getMeat(id)?.pricePerKg ?? 0) * kg, 0);
 
+/** Adresse publique du site — à changer ici (et dans public/sitemap.xml, public/robots.txt) en cas de nom de domaine. */
+export const SITE_URL = "https://djawan.lovable.app";
+
+/** Balises de partage (WhatsApp, Facebook…) communes à toutes les pages publiques. */
+export const shareMeta = (path: string) => [
+  { property: "og:url", content: `${SITE_URL}${path}` },
+  { property: "og:site_name", content: "Djawan Sahel Meat" },
+  { property: "og:locale", content: "fr_FR" },
+  { property: "og:image", content: `${SITE_URL}/og-image.jpg` },
+  { property: "og:image:width", content: "1200" },
+  { property: "og:image:height", content: "630" },
+  { property: "og:image:alt", content: "Djawan Sahel Meat — box de viande fraîche livrées à Bamako" },
+  { name: "twitter:image", content: `${SITE_URL}/og-image.jpg` },
+];
+
 /** Numéro WhatsApp officiel Djawan Sahel Meat, format international sans « + ». */
 export const WHATSAPP_NUMBER = "22371699120";
+
+/** Fiche « commerce local » pour Google. N'y mettre que des informations validées. */
+export const businessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Store",
+  name: "Djawan Sahel Meat",
+  description: "Box de viande fraîche (bœuf, mouton, poulet, abats) avec livraison à domicile à Bamako et environs. Commande sur WhatsApp.",
+  slogan: "Viande fraîche • Qualité • Confiance",
+  url: SITE_URL,
+  logo: `${SITE_URL}/logo.png`,
+  image: `${SITE_URL}/og-image.jpg`,
+  telephone: `+${WHATSAPP_NUMBER}`,
+  currenciesAccepted: "XOF",
+  address: { "@type": "PostalAddress", addressLocality: "Bamako", addressCountry: "ML" },
+  areaServed: { "@type": "City", name: "Bamako" },
+};
 
 export function whatsappUrl(message: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
