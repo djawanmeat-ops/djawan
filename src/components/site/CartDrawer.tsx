@@ -1,4 +1,4 @@
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { formatFCFA, getMeat, whatsappUrl } from "@/data/djawan";
@@ -42,9 +42,12 @@ export function CartDrawer() {
             <ul>
               {lines.map((l) => (
                 <li key={l.key} className="border-b border-border py-4">
-                  <div className="flex justify-between gap-3">
+                  <div className="flex items-start justify-between gap-3">
                     <p className="text-sm font-bold text-brown">{lineLabel(l)}</p>
-                    <button type="button" onClick={() => remove(l.key)} className="shrink-0 text-xs font-semibold text-muted-foreground underline hover:text-primary">Retirer</button>
+                    <button type="button" onClick={() => remove(l.key)} aria-label={`Retirer ${lineLabel(l)} du panier`}
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs font-bold text-primary transition hover:border-primary">
+                      <Trash2 size={14} /> Retirer
+                    </button>
                   </div>
                   {l.mix && <p className="mt-1 text-xs text-muted-foreground">{Object.entries(l.mix).map(([id, kg]) => `${getMeat(id)?.name} ${kg} kg`).join(" · ")}</p>}
                   {lineCut(l) && <p className="mt-1 text-xs font-semibold text-secondary">Découpe : {lineCut(l)}</p>}
@@ -74,6 +77,10 @@ export function CartDrawer() {
           <button type="button" onClick={submit} disabled={!lines.length}
             className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-40">
             Valider sur WhatsApp
+          </button>
+          <button type="button" onClick={() => setOpen(false)}
+            className="mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-md border border-border px-5 py-2 text-sm font-bold text-brown transition hover:border-brown/50">
+            Continuer mes achats
           </button>
         </div>
       </SheetContent>
