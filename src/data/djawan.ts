@@ -56,6 +56,14 @@ export const promos: Promo[] = [
   { id: "achoura", name: "Promo Achoura", tagline: "Pour le repas de l'Achoura.", offer: "", hijri: { month: 1, day: 10, feast: "Achoura" } },
 ];
 
+/** Moyens de paiement proposés à la validation du panier. */
+export const paymentOptions = [
+  { id: "orange-money", label: "Orange Money" },
+  { id: "moov-money", label: "Moov Money" },
+  { id: "especes", label: "Espèces à la livraison" },
+] as const;
+export const getPayment = (id?: string) => paymentOptions.find((p) => p.id === id);
+
 export type Category = "boeuf" | "mouton" | "abats" | "poulet";
 
 export const categories: { id: Category | "tout" | "melange"; label: string }[] = [
@@ -174,8 +182,8 @@ export const faqs = [
   },
   {
     question: "Quels sont les moyens de paiement ?",
-    answer: "Les moyens de paiement disponibles seront confirmés lors de votre échange sur WhatsApp.",
-    pending: true,
+    answer: "Vous pouvez payer par Orange Money, par Moov Money ou en espèces à la livraison. Choisissez votre moyen de paiement au moment de valider votre panier.",
+    pending: false,
   },
   {
     question: "Comment fonctionne l’Avatar Crédit ?",

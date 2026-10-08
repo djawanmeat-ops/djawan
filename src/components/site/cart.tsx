@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import { toast } from "sonner";
-import { formatFCFA, getCut, getFormat, getMeat, mixPrice, type FormatId } from "@/data/djawan";
+import { formatFCFA, getCut, getFormat, getMeat, getPayment, mixPrice, type FormatId } from "@/data/djawan";
 
 export type CartLine = {
   key: string;
@@ -12,8 +12,19 @@ export type CartLine = {
   cut?: string;
 };
 
-export type Delivery = { name: string; area: string; when: string; note: string };
-const emptyDelivery: Delivery = { name: "", area: "", when: "", note: "" };
+export type GeoPoint = { lat: number; lng: number; accuracy: number };
+export type Delivery = { name: string; area: string; when: string; note: string; payment: string; location: GeoPoint | null };
+const emptyDelivery: Delivery = { name: "", area: "", when: "", note: "", payment: "", location: null };
+
+export const mapsUrl = (p: GeoPoint) => `https://maps.google.com/?q=${p.lat},${p.lng}`;
+
+/** Nom ou position + quartier + moyen de paiement : le minimum pour livrer. */
+export const deliveryIssues = (d: Delivery) =>
+  [
+    !d.name.trim() && "votre nom",
+    !d.area.trim() && !d.location && "votre quartier ou votre position",
+    !getPayment(d.payment) && "un moyen de paiement",
+  ].filter(Boolean) as string[];
 
 type CartCtx = {
   lines: CartLine[];
@@ -23,7 +34,7 @@ type CartCtx = {
   setQty: (key: string, qty: number) => void;
   remove: (key: string) => void;
   delivery: Delivery;
-  setDelivery: (d: Delivery) => void;
+  setDelivery: Dispatch<SetStateAction<Delivery>>;
   count: number;
   total: number;
 };
@@ -57,9 +68,13 @@ export function cartMessage(lines: CartLine[], total: number, d?: Delivery) {
   });
   let msg = `Bonjour Djawan Sahel Meat, je souhaite commander :\n${rows.join("\n")}\n\nTotal : ${formatFCFA(total)}`;
   if (d) {
-    msg += `\n\nLivraison :\n• Nom : ${d.name}\n• Quartier : ${d.area}`;
+    msg += `\n\nLivraison :\n• Nom : ${d.name}`;
+    if (d.area.trim()) msg += `\n• Quartier : ${d.area}`;
+    if (d.location) msg += `\n• Position : ${mapsUrl(d.location)}`;
     if (d.when.trim()) msg += `\n• Date / créneau : ${d.when}`;
     if (d.note.trim()) msg += `\n• Remarque : ${d.note}`;
+    const payment = getPayment(d.payment);
+    if (payment) msg += `\n\nPaiement : ${payment.label}`;
   }
   return msg;
 }
