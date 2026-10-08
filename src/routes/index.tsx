@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MessageCircle } from "lucide-react";
-import heroImage from "@/assets/djawan-hero.jpg";
-import storyImage from "@/assets/djawan-story.jpg";
+import heroImage from "@/assets/djawan-hero.webp";
+import storyImage from "@/assets/djawan-story.webp";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/site/Button";
@@ -40,7 +40,7 @@ function Index() {
       <main>
         <PromoBanner />
         <section id="accueil" className="relative min-h-[92svh] overflow-hidden bg-brown pt-20 text-cream">
-          <img src={heroImage} alt="Sélection de viandes fraîches Djawan Sahel Meat" width={1600} height={1104} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-[62%_center]" />
+          <img src={heroImage} alt="Sélection de viandes fraîches Djawan Sahel Meat" width={1264} height={848} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-[62%_center]" />
           <div className="absolute inset-0 bg-hero-overlay" />
           <div className="relative mx-auto flex min-h-[calc(92svh-5rem)] max-w-7xl items-center px-5 py-16 lg:px-8">
             <div className="hero-enter max-w-3xl">
@@ -77,7 +77,7 @@ function Index() {
 
         <section id="apropos" className="scroll-mt-20 bg-cream px-5 py-24 lg:px-8 lg:py-32">
           <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
-            <Reveal><div className="overflow-hidden rounded-lg"><img src={storyImage} alt="Préparation attentive de viande fraîche chez Djawan Sahel Meat" width={1408} height={1008} loading="lazy" className="aspect-[4/3] h-full w-full object-cover" /></div></Reveal>
+            <Reveal><div className="overflow-hidden rounded-lg"><img src={storyImage} alt="Préparation attentive de viande fraîche chez Djawan Sahel Meat" width={1200} height={896} loading="lazy" decoding="async" className="aspect-[4/3] h-full w-full object-cover" /></div></Reveal>
             <Reveal><SectionTitle eyebrow="Notre histoire" title="L'art de bien choisir, le soin de bien servir." text="Chez Djawan Sahel Meat, chaque pièce est sélectionnée avec exigence, puis conditionnée avec soin. Notre maison repose sur trois valeurs : la fraîcheur, la qualité et la confiance que nous accordent les familles de Bamako." /></Reveal>
           </div>
         </section>
@@ -122,7 +122,7 @@ function Index() {
         </section>
 
         <section className="relative min-h-[620px] overflow-hidden bg-brown px-5 py-24 text-cream lg:px-8 lg:py-32">
-          <img src={heroImage} alt="Viandes fraîches sélectionnées avec soin" width={1600} height={1104} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-right" />
+          <img src={heroImage} alt="Viandes fraîches sélectionnées avec soin" width={1264} height={848} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-right" />
           <div className="absolute inset-0 bg-commitment-overlay" />
           <Reveal className="relative mx-auto max-w-7xl"><p className="text-xs font-black uppercase tracking-[0.2em] text-gold">Nos engagements</p><h2 className="mt-8 max-w-3xl font-display text-5xl leading-[1.05] font-black sm:text-7xl">La fraîcheur.<br />La qualité.<br />La confiance.</h2><p className="mt-8 max-w-lg leading-7 text-cream/75">Trois piliers qui guident chacune de nos box, de la sélection jusqu'à votre table.</p></Reveal>
         </section>

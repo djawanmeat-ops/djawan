@@ -1,18 +1,18 @@
-import hachee from "@/assets/meat-hachee.jpg";
-import sansGraisse from "@/assets/meat-sans-graisse.jpg";
-import beefSteak from "@/assets/meat-beef-steak.jpg";
-import coteBoeuf from "@/assets/meat-cote-boeuf.jpg";
-import avecOs from "@/assets/meat-avec-os.jpg";
-import foieCoeur from "@/assets/meat-foie-coeur.jpg";
-import rognon from "@/assets/meat-rognon.jpg";
-import os from "@/assets/meat-os.jpg";
-import mouton from "@/assets/meat-mouton.jpg";
-import filet from "@/assets/meat-filet.jpg";
-import pouletEntier from "@/assets/meat-poulet-entier.jpg";
-import blancPoulet from "@/assets/meat-blanc-poulet.jpg";
-import cuissePoulet from "@/assets/meat-cuisse-poulet.jpg";
-import ailePoulet from "@/assets/meat-aile-poulet.jpg";
-import melange from "@/assets/meat-melange.jpg";
+import hachee from "@/assets/meat-hachee.webp";
+import sansGraisse from "@/assets/meat-sans-graisse.webp";
+import beefSteak from "@/assets/meat-beef-steak.webp";
+import coteBoeuf from "@/assets/meat-cote-boeuf.webp";
+import avecOs from "@/assets/meat-avec-os.webp";
+import foieCoeur from "@/assets/meat-foie-coeur.webp";
+import rognon from "@/assets/meat-rognon.webp";
+import os from "@/assets/meat-os.webp";
+import mouton from "@/assets/meat-mouton.webp";
+import filet from "@/assets/meat-filet.webp";
+import pouletEntier from "@/assets/meat-poulet-entier.webp";
+import blancPoulet from "@/assets/meat-blanc-poulet.webp";
+import cuissePoulet from "@/assets/meat-cuisse-poulet.webp";
+import ailePoulet from "@/assets/meat-aile-poulet.webp";
+import melange from "@/assets/meat-melange.webp";
 
 export const navItems = [
   { label: "Accueil", href: "/#accueil" },

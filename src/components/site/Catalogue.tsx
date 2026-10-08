@@ -39,7 +39,7 @@ function ProductCard({ meat }: { meat: Meat }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card">
       <div className="aspect-[4/3] overflow-hidden">
-        <img src={meat.image} alt={`Box ${meat.name} — paquets sous vide dans le carton Djawan`} width={1200} height={896} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]" />
+        <img src={meat.image} alt={`Box ${meat.name} — paquets sous vide dans le carton Djawan`} width={800} height={597} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]" />
       </div>
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div>
@@ -85,7 +85,7 @@ function MixBuilder() {
   return (
     <div className="grid overflow-hidden rounded-lg border border-border bg-card lg:grid-cols-[0.8fr_1.2fr]">
       <div className="relative min-h-64 bg-brown">
-        <img src={melangeImage} alt="Box Mélange — plusieurs viandes sous vide dans le carton Djawan" width={1200} height={896} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={melangeImage} alt="Box Mélange — plusieurs viandes sous vide dans le carton Djawan" width={800} height={597} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
       </div>
       <div className="p-6 sm:p-8">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-secondary">Box Mélange</p>

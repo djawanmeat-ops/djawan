@@ -50,7 +50,7 @@ export function Advisor() {
                 const m = getMeat(r.meatId)!; const f = getFormat(r.formatId as FormatId);
                 return (
                   <li key={r.meatId} className="flex gap-4 rounded-md border border-border bg-background p-3">
-                    <img src={m.image} alt={m.name} width={96} height={72} loading="lazy" className="h-18 w-24 shrink-0 rounded object-cover" />
+                    <img src={m.image} alt={m.name} width={96} height={72} loading="lazy" decoding="async" className="h-18 w-24 shrink-0 rounded object-cover" />
                     <div className="min-w-0 flex-1">
                       <p className="font-bold text-brown">{m.name} <span className="text-xs font-semibold text-muted-foreground">· Box {f.name} {f.kg} kg</span></p>
                       <p className="mt-1 text-xs leading-5 text-muted-foreground">{r.reason}</p>
