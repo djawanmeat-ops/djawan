@@ -28,7 +28,7 @@ export function Advisor() {
         <h3 className="mt-3 font-display text-3xl font-black text-brown">Dites-nous ce que vous cuisinez.</h3>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">Décrivez votre plat et le nombre de convives : nous vous suggérons les morceaux les plus adaptés de notre sélection.</p>
         <form className="mt-6" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={600} placeholder="Ex. Un mafé pour 6 personnes dimanche"
+          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={300} placeholder="Ex. Un mafé pour 6 personnes dimanche"
             className="w-full rounded-md border border-border bg-background p-3 text-sm text-brown outline-none focus:border-brown" />
           <div className="mt-3 flex flex-wrap gap-2">
             {examples.map((ex) => <button key={ex} type="button" onClick={() => { setText(ex); submit(ex); }} className="min-h-10 rounded-full border border-border px-4 py-2 text-xs font-semibold text-brown hover:border-brown/50">{ex}</button>)}

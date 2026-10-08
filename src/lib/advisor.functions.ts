@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { formats, meats } from "@/data/djawan";
 
@@ -27,9 +28,55 @@ const schema = {
   },
 };
 
+/**
+ * Garde-fous contre l'abus des crédits IA. Mémoire propre à chaque instance serveur :
+ * ce n'est pas une limite exacte, mais elle bloque les rafales et les boucles d'un même visiteur.
+ */
+const MINUTE = 60_000;
+const DAY = 24 * 60 * MINUTE;
+const PER_IP_MINUTE = 4;
+const PER_IP_DAY = 20;
+const GLOBAL_MINUTE = 60;
+const hitsByIp = new Map<string, number[]>();
+let globalHits: number[] = [];
+const cache = new Map<string, AdvisorResult>();
+
+const LIMIT_MESSAGE =
+  "Vous avez atteint la limite de conseils pour le moment. Réessayez un peu plus tard, ou écrivez-nous directement sur WhatsApp.";
+
+function clientIp() {
+  const h = getRequest()?.headers;
+  return h?.get("cf-connecting-ip") || h?.get("x-real-ip") || h?.get("x-forwarded-for")?.split(",")[0]?.trim() || null;
+}
+
+function allow(ip: string | null) {
+  const now = Date.now();
+  globalHits = globalHits.filter((t) => now - t < MINUTE);
+  if (globalHits.length >= GLOBAL_MINUTE) return false;
+  if (ip) {
+    const hits = (hitsByIp.get(ip) ?? []).filter((t) => now - t < DAY);
+    if (hits.length >= PER_IP_DAY || hits.filter((t) => now - t < MINUTE).length >= PER_IP_MINUTE) {
+      hitsByIp.set(ip, hits);
+      return false;
+    }
+    hits.push(now);
+    hitsByIp.delete(ip); // réinsertion : la Map reste triée du plus ancien au plus récent
+    hitsByIp.set(ip, hits);
+    if (hitsByIp.size > 5000) hitsByIp.delete(hitsByIp.keys().next().value!);
+  }
+  globalHits.push(now);
+  return true;
+}
+
+const cacheKey = (request: string) => request.toLowerCase().replace(/\s+/g, " ").trim();
+
 export const recommendCuts = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ request: z.string().trim().min(3).max(600) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ request: z.string().trim().min(3).max(300) }).parse(d))
   .handler(async ({ data }): Promise<AdvisorResult> => {
+    const cached = cache.get(cacheKey(data.request));
+    if (cached) return cached;
+    if (!allow(clientIp())) return { intro: "", items: [], error: LIMIT_MESSAGE };
+
     const key = process.env["LOVABLE_API_KEY"];
     if (!key) return { intro: "", items: [], error: "Le conseiller n'est pas disponible pour le moment." };
 
@@ -51,6 +98,7 @@ N'invente jamais de prix, de promotion, de délai ni d'engagement commercial.`;
           input: data.request,
           stream: true,
           store: false,
+          max_output_tokens: 2000,
           reasoning: { effort: "low", summary: "auto" },
           include: ["reasoning.encrypted_content"],
           text: { format: { type: "json_schema", name: "recommandations", strict: true, schema } },
@@ -85,7 +133,12 @@ N'invente jamais de prix, de promotion, de délai ni d'engagement commercial.`;
       if (!text) return { intro: "", items: [], error: "Le conseiller n'a pas pu répondre à cette demande." };
       const parsed = JSON.parse(text) as AdvisorResult;
       const ids = new Set(meats.map((m) => m.id));
-      return { intro: parsed.intro, items: parsed.items.filter((i) => ids.has(i.meatId)).slice(0, 3) };
+      const result = { intro: parsed.intro, items: parsed.items.filter((i) => ids.has(i.meatId)).slice(0, 3) };
+      if (result.items.length) {
+        cache.set(cacheKey(data.request), result);
+        if (cache.size > 300) cache.delete(cache.keys().next().value!);
+      }
+      return result;
     } catch (e) {
       console.error("advisor error", e);
       return { intro: "", items: [], error: "Le conseiller n'a pas pu répondre. Réessayez plus tard." };
