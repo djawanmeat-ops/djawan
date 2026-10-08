@@ -44,12 +44,28 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+/**
+ * En-têtes de sécurité. L'anti-clickjacking est limité aux pages privées : sur tout le site,
+ * il empêcherait l'aperçu de l'éditeur Lovable, qui affiche le site dans un cadre.
+ */
+function withSecurityHeaders(request: Request, response: Response): Response {
+  const secured = new Response(response.body, response);
+  secured.headers.set("Permissions-Policy", "camera=(), microphone=(), payment=(), usb=(), geolocation=(self)");
+  secured.headers.set("X-Content-Type-Options", "nosniff");
+  const path = new URL(request.url).pathname;
+  if (path === "/admin" || path.startsWith("/admin/") || path === "/auth") {
+    secured.headers.set("X-Frame-Options", "DENY");
+    secured.headers.set("Content-Security-Policy", "frame-ancestors 'none'");
+  }
+  return secured;
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return withSecurityHeaders(request, await normalizeCatastrophicSsrResponse(response));
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {

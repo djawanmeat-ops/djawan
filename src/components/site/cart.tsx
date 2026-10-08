@@ -91,7 +91,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setReady(true);
   }, []);
   useEffect(() => { if (ready) localStorage.setItem(STORAGE, JSON.stringify(lines)); }, [lines, ready]);
-  useEffect(() => { if (ready) localStorage.setItem(STORAGE_DELIVERY, JSON.stringify(delivery)); }, [delivery, ready]);
+  // La position GPS n'est jamais conservée sur l'appareil : elle ne sert qu'à la commande en cours.
+  useEffect(() => { if (ready) localStorage.setItem(STORAGE_DELIVERY, JSON.stringify({ ...delivery, location: null })); }, [delivery, ready]);
 
   const add: CartCtx["add"] = (line, n = 1) => {
     const cut = line.cut ?? "aucune";

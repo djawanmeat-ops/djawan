@@ -35,7 +35,9 @@ function AuthPage() {
     } else {
       const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/admin` } });
       setBusy(false);
-      setMsg(error ? error.message : "Compte créé. Confirmez votre e-mail, puis connectez-vous.");
+      // Message générique : ne pas révéler quelles adresses ont déjà un compte.
+      if (error) console.error("signup", error.message);
+      setMsg(error ? "Création du compte impossible. Vérifiez l'adresse e-mail et choisissez un mot de passe d'au moins 8 caractères." : "Si cette adresse est valide, un e-mail de confirmation vient de vous être envoyé.");
     }
   }
 
