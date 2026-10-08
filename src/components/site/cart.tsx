@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 import { formatFCFA, getCut, getFormat, getMeat, mixPrice, type FormatId } from "@/data/djawan";
 
 export type CartLine = {
@@ -87,7 +88,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const found = prev.find((l) => l.key === key);
       return found ? prev.map((l) => (l.key === key ? { ...l, qty: l.qty + n } : l)) : [...prev, { ...line, cut, key, qty: n }];
     });
-    setOpen(true);
+    // Le panier reste fermé pour que le client continue d'ajouter d'autres articles.
+    toast.success(`${n} × ${lineLabel({ ...line, key, qty: n })} ajouté${n > 1 ? "s" : ""} au panier`, {
+      action: { label: "Voir le panier", onClick: () => setOpen(true) },
+    });
   };
   const setQty = (key: string, qty: number) =>
     setLines((prev) => (qty < 1 ? prev.filter((l) => l.key !== key) : prev.map((l) => (l.key === key ? { ...l, qty } : l))));

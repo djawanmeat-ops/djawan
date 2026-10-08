@@ -34,6 +34,7 @@ function ProductCard({ meat }: { meat: Meat }) {
   const [format, setFormat] = useState<FormatId>("decouverte");
   const [qty, setQty] = useState(1);
   const [cut, setCut] = useState("aucune");
+  const [added, setAdded] = useState(false);
   const { add } = useCart();
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card">
@@ -59,7 +60,9 @@ function ProductCard({ meat }: { meat: Meat }) {
           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{qty} × Box {getFormat(format).name}</span>
           <span className="text-xl font-black text-primary">{formatFCFA(boxPrice(meat, format) * qty)}</span>
         </div>
-        <button type="button" className={btn} onClick={() => { add({ meatId: meat.id, formatId: format, cut }, qty); setQty(1); }}>Ajouter au panier</button>
+        <button type="button" className={btn} onClick={() => { add({ meatId: meat.id, formatId: format, cut }, qty); setQty(1); setAdded(true); setTimeout(() => setAdded(false), 1800); }}>
+          {added ? "Ajouté ✓ — ajoutez-en d'autres" : "Ajouter au panier"}
+        </button>
       </div>
     </article>
   );
