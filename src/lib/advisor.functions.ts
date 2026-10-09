@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { formats, meats } from "@/data/djawan";
 
@@ -28,45 +27,10 @@ const schema = {
   },
 };
 
-/**
- * Garde-fous contre l'abus des crédits IA. Mémoire propre à chaque instance serveur :
- * ce n'est pas une limite exacte, mais elle bloque les rafales et les boucles d'un même visiteur.
- */
-const MINUTE = 60_000;
-const DAY = 24 * 60 * MINUTE;
-const PER_IP_MINUTE = 4;
-const PER_IP_DAY = 20;
-const GLOBAL_MINUTE = 60;
-const hitsByIp = new Map<string, number[]>();
-let globalHits: number[] = [];
 const cache = new Map<string, AdvisorResult>();
 
 const LIMIT_MESSAGE =
   "Vous avez atteint la limite de conseils pour le moment. Réessayez un peu plus tard, ou écrivez-nous directement sur WhatsApp.";
-
-function clientIp() {
-  const h = getRequest()?.headers;
-  return h?.get("cf-connecting-ip") || h?.get("x-real-ip") || h?.get("x-forwarded-for")?.split(",")[0]?.trim() || null;
-}
-
-function allow(ip: string | null) {
-  const now = Date.now();
-  globalHits = globalHits.filter((t) => now - t < MINUTE);
-  if (globalHits.length >= GLOBAL_MINUTE) return false;
-  if (ip) {
-    const hits = (hitsByIp.get(ip) ?? []).filter((t) => now - t < DAY);
-    if (hits.length >= PER_IP_DAY || hits.filter((t) => now - t < MINUTE).length >= PER_IP_MINUTE) {
-      hitsByIp.set(ip, hits);
-      return false;
-    }
-    hits.push(now);
-    hitsByIp.delete(ip); // réinsertion : la Map reste triée du plus ancien au plus récent
-    hitsByIp.set(ip, hits);
-    if (hitsByIp.size > 5000) hitsByIp.delete(hitsByIp.keys().next().value!);
-  }
-  globalHits.push(now);
-  return true;
-}
 
 const cacheKey = (request: string) => request.toLowerCase().replace(/\s+/g, " ").trim();
 
@@ -75,7 +39,8 @@ export const recommendCuts = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<AdvisorResult> => {
     const cached = cache.get(cacheKey(data.request));
     if (cached) return cached;
-    if (!allow(clientIp())) return { intro: "", items: [], error: LIMIT_MESSAGE };
+    const { allowAdvisor } = await import("@/lib/rate-limit.server");
+    if (!allowAdvisor()) return { intro: "", items: [], error: LIMIT_MESSAGE };
 
     const key = process.env["LOVABLE_API_KEY"];
     if (!key) return { intro: "", items: [], error: "Le conseiller n'est pas disponible pour le moment." };

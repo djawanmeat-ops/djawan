@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import { toast } from "sonner";
-import { formatFCFA, getCut, getFormat, getMeat, getPayment, mixPrice, type FormatId } from "@/data/djawan";
+import { formatFCFA, getCut, getFormat, getMeat, getPayment, mixPrice, splitInThree, type FormatId } from "@/data/djawan";
+import { normalizePhone } from "@/lib/phone";
 
 export type CartLine = {
   key: string;
@@ -13,15 +14,25 @@ export type CartLine = {
 };
 
 export type GeoPoint = { lat: number; lng: number; accuracy: number };
-export type Delivery = { name: string; area: string; when: string; note: string; payment: string; location: GeoPoint | null };
-const emptyDelivery: Delivery = { name: "", area: "", when: "", note: "", payment: "", location: null };
+export type Delivery = {
+  name: string;
+  phone: string;
+  area: string;
+  when: string;
+  note: string;
+  payment: string;
+  location: GeoPoint | null;
+  jawan28: boolean;
+};
+const emptyDelivery: Delivery = { name: "", phone: "", area: "", when: "", note: "", payment: "", location: null, jawan28: false };
 
 export const mapsUrl = (p: GeoPoint) => `https://maps.google.com/?q=${p.lat},${p.lng}`;
 
-/** Nom ou position + quartier + moyen de paiement : le minimum pour livrer. */
+/** Nom, téléphone, quartier ou position, moyen de paiement : le minimum pour livrer. */
 export const deliveryIssues = (d: Delivery) =>
   [
     !d.name.trim() && "votre nom",
+    !normalizePhone(d.phone) && "un numéro de téléphone valide",
     !d.area.trim() && !d.location && "votre quartier ou votre position",
     !getPayment(d.payment) && "un moyen de paiement",
   ].filter(Boolean) as string[];
@@ -35,6 +46,8 @@ type CartCtx = {
   remove: (key: string) => void;
   delivery: Delivery;
   setDelivery: Dispatch<SetStateAction<Delivery>>;
+  /** Vide le panier après une commande enregistrée (garde nom, téléphone, quartier et paiement). */
+  clear: () => void;
   count: number;
   total: number;
 };
@@ -58,7 +71,7 @@ export function lineCut(line: CartLine) {
   return c && c.id !== "aucune" ? c.label : null;
 }
 
-export function cartMessage(lines: CartLine[], total: number, d?: Delivery) {
+export function cartMessage(lines: CartLine[], total: number, d?: Delivery, orderNumber?: string) {
   const rows = lines.map((l) => {
     let s = `• ${l.qty} × ${lineLabel(l)} : ${formatFCFA(linePrice(l))}`;
     if (l.mix) s += "\n" + Object.entries(l.mix).map(([id, kg]) => `   - ${getMeat(id)?.name} : ${kg} kg`).join("\n");
@@ -66,15 +79,19 @@ export function cartMessage(lines: CartLine[], total: number, d?: Delivery) {
     if (cut) s += `\n   Découpe : ${cut}`;
     return s;
   });
-  let msg = `Bonjour Djawan Sahel Meat, je souhaite commander :\n${rows.join("\n")}\n\nTotal : ${formatFCFA(total)}`;
+  const intro = orderNumber ? `Bonjour Djawan Sahel Meat, voici ma commande ${orderNumber} :` : "Bonjour Djawan Sahel Meat, je souhaite commander :";
+  let msg = `${intro}\n${rows.join("\n")}\n\nTotal : ${formatFCFA(total)}`;
   if (d) {
     msg += `\n\nLivraison :\n• Nom : ${d.name}`;
+    const phone = normalizePhone(d.phone);
+    if (phone) msg += `\n• Téléphone : ${phone}`;
     if (d.area.trim()) msg += `\n• Quartier : ${d.area}`;
     if (d.location) msg += `\n• Position : ${mapsUrl(d.location)}`;
     if (d.when.trim()) msg += `\n• Date / créneau : ${d.when}`;
     if (d.note.trim()) msg += `\n• Remarque : ${d.note}`;
     const payment = getPayment(d.payment);
     if (payment) msg += `\n\nPaiement : ${payment.label}`;
+    if (d.jawan28) msg += `\nAvatar Crédit (Jawan 28) demandé : 3 tranches de ${splitInThree(total).map(formatFCFA).join(" / ")} (J0, J14, J28), sous réserve de validation.`;
   }
   return msg;
 }
@@ -112,11 +129,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const setQty = (key: string, qty: number) =>
     setLines((prev) => (qty < 1 ? prev.filter((l) => l.key !== key) : prev.map((l) => (l.key === key ? { ...l, qty } : l))));
   const remove = (key: string) => setLines((prev) => prev.filter((l) => l.key !== key));
+  const clear = () => {
+    setLines([]);
+    setDelivery((d) => ({ ...d, when: "", note: "", location: null, jawan28: false }));
+  };
 
   const count = lines.reduce((s, l) => s + l.qty, 0);
   const total = lines.reduce((s, l) => s + linePrice(l), 0);
 
-  return <Ctx.Provider value={{ lines, open, setOpen, add, setQty, remove, delivery, setDelivery, count, total }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ lines, open, setOpen, add, setQty, remove, delivery, setDelivery, clear, count, total }}>{children}</Ctx.Provider>;
 }
 
 export function useCart() {

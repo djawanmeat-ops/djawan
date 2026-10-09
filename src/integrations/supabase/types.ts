@@ -14,6 +14,157 @@ export type Database = {
   }
   public: {
     Tables: {
+      order_items: {
+        Row: {
+          cut: string | null
+          format_id: string
+          format_kg: number
+          id: string
+          label: string
+          line_total: number
+          meat_id: string | null
+          mix: Json | null
+          order_id: string
+          qty: number
+          unit_price: number
+        }
+        Insert: {
+          cut?: string | null
+          format_id: string
+          format_kg: number
+          id?: string
+          label: string
+          line_total: number
+          meat_id?: string | null
+          mix?: Json | null
+          order_id: string
+          qty: number
+          unit_price: number
+        }
+        Update: {
+          cut?: string | null
+          format_id?: string
+          format_kg?: number
+          id?: string
+          label?: string
+          line_total?: number
+          meat_id?: string | null
+          mix?: Json | null
+          order_id?: string
+          qty?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_status_logs: {
+        Row: {
+          changed_by: string | null
+          comment: string
+          created_at: string
+          id: number
+          new_status: string
+          old_status: string | null
+          order_id: string
+        }
+        Insert: {
+          changed_by?: string | null
+          comment?: string
+          created_at?: string
+          id?: never
+          new_status: string
+          old_status?: string | null
+          order_id: string
+        }
+        Update: {
+          changed_by?: string | null
+          comment?: string
+          created_at?: string
+          id?: never
+          new_status?: string
+          old_status?: string | null
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          area: string
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          delivery_when: string
+          gps_accuracy: number | null
+          id: string
+          jawan28_requested: boolean
+          lat: number | null
+          lng: number | null
+          note: string
+          number: string
+          payment_method: string
+          source: string
+          status: string
+          total_fcfa: number
+          total_kg: number
+          updated_at: string
+        }
+        Insert: {
+          area?: string
+          created_at?: string
+          customer_name: string
+          customer_phone: string
+          delivery_when?: string
+          gps_accuracy?: number | null
+          id?: string
+          jawan28_requested?: boolean
+          lat?: number | null
+          lng?: number | null
+          note?: string
+          number?: string
+          payment_method: string
+          source?: string
+          status?: string
+          total_fcfa: number
+          total_kg: number
+          updated_at?: string
+        }
+        Update: {
+          area?: string
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          delivery_when?: string
+          gps_accuracy?: number | null
+          id?: string
+          jawan28_requested?: boolean
+          lat?: number | null
+          lng?: number | null
+          note?: string
+          number?: string
+          payment_method?: string
+          source?: string
+          status?: string
+          total_fcfa?: number
+          total_kg?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       promos: {
         Row: {
           active: boolean
@@ -85,9 +236,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
+      create_web_order: {
+        Args: { _order: Json; _items: Json }
+        Returns: { order_id: string; order_number: string }[]
+      }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "pdg" | "gestionnaire"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -215,7 +371,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "pdg", "gestionnaire"],
     },
   },
 } as const

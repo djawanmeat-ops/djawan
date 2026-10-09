@@ -1,8 +1,11 @@
-import { Loader2, LocateFixed, MapPin, ShoppingBag, Trash2 } from "lucide-react";
+import { CheckCircle2, Loader2, LocateFixed, MapPin, ShoppingBag, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { formatFCFA, getMeat, getPayment, paymentOptions, whatsappUrl } from "@/data/djawan";
+import { formatFCFA, getMeat, getPayment, paymentOptions, splitInThree, whatsappUrl } from "@/data/djawan";
 import { getPosition, positionError, reverseGeocode } from "@/lib/geo";
+import { createOrder, type CreatedOrder } from "@/lib/orders.functions";
+import { normalizePhone } from "@/lib/phone";
 import { cn } from "@/lib/utils";
 import { cartMessage, deliveryIssues, lineCut, lineLabel, linePrice, mapsUrl, useCart } from "./cart";
 
@@ -89,28 +92,65 @@ function PaymentPicker({ invalid }: { invalid: boolean }) {
 }
 
 export function CartDrawer() {
-  const { lines, open, setOpen, setQty, remove, total, delivery, setDelivery } = useCart();
+  const { lines, open, setOpen, setQty, remove, total, delivery, setDelivery, clear } = useCart();
   const [tried, setTried] = useState(false);
   const issues = deliveryIssues(delivery);
-  const set = (k: "name" | "area" | "when" | "note") => (e: { target: { value: string } }) => {
+  const set = (k: "name" | "phone" | "area" | "when" | "note") => (e: { target: { value: string } }) => {
     const value = e.target.value;
     setDelivery((d) => ({ ...d, [k]: value }));
   };
+  const create = useServerFn(createOrder);
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState<{ number: string; url: string } | null>(null);
 
-  const submit = () => {
+  /**
+   * La commande est enregistrée avant l'ouverture de WhatsApp. Si l'enregistrement échoue,
+   * WhatsApp s'ouvre quand même avec le message habituel : aucune vente n'est perdue.
+   */
+  const submit = async () => {
     setTried(true);
-    if (!lines.length || issues.length) return;
-    window.open(whatsappUrl(cartMessage(lines, total, delivery)), "_blank", "noopener");
+    if (!lines.length || issues.length || sending) return;
+    // Fenêtre ouverte tout de suite : ouverte après l'attente, elle serait bloquée par le navigateur.
+    const win = window.open("", "_blank");
+    if (win) win.opener = null;
+    setSending(true);
+    let res: CreatedOrder = { ok: false, error: "" };
+    try {
+      res = await create({
+        data: {
+          lines: lines.map(({ formatId, qty, meatId, mix, cut }) => ({ formatId, qty, meatId, mix, cut })),
+          delivery: { name: delivery.name, phone: delivery.phone, area: delivery.area, when: delivery.when, note: delivery.note, payment: delivery.payment, location: delivery.location, jawan28: delivery.jawan28 },
+        },
+      });
+    } catch (e) {
+      console.error("createOrder", e);
+    }
+    const url = whatsappUrl(cartMessage(lines, res.ok ? res.total : total, delivery, res.ok ? res.number : undefined));
+    if (win) win.location.href = url;
+    else window.location.href = url;
+    if (res.ok) {
+      clear();
+      setTried(false);
+      setDone({ number: res.number, url });
+    }
+    setSending(false);
   };
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (!v) setDone(null); }}>
       <SheetContent className="flex w-full flex-col overflow-y-auto bg-background sm:max-w-md">
         <SheetHeader>
           <SheetTitle className="font-display text-2xl font-black text-brown">Votre panier</SheetTitle>
           <SheetDescription>Validez pour envoyer votre commande sur WhatsApp.</SheetDescription>
         </SheetHeader>
-        {lines.length === 0 ? (
+        {done ? (
+          <div className="flex-1 py-8 text-center" role="status">
+            <CheckCircle2 size={44} className="mx-auto text-whatsapp" />
+            <p className="mt-4 font-display text-2xl font-black text-brown">Commande {done.number} enregistrée</p>
+            <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-muted-foreground">Envoyez le message WhatsApp qui s'est ouvert : notre équipe vous répond pour confirmer la livraison.</p>
+            <a href={done.url} target="_blank" rel="noreferrer" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-md bg-whatsapp px-5 text-sm font-bold text-whatsapp-foreground">WhatsApp ne s'est pas ouvert ? Cliquez ici</a>
+          </div>
+        ) : lines.length === 0 ? (
           <p className="flex-1 py-10 text-center text-sm text-muted-foreground">Votre panier est vide.</p>
         ) : (
           <>
@@ -140,6 +180,9 @@ export function CartDrawer() {
             <fieldset className="mt-5 grid gap-3">
               <legend className="mb-1 text-xs font-black uppercase tracking-[0.18em] text-secondary">Livraison</legend>
               <label className="text-xs font-bold text-brown">Nom et prénom *<input value={delivery.name} onChange={set("name")} className={field} autoComplete="name" /></label>
+              <label className="text-xs font-bold text-brown">Téléphone *<input type="tel" inputMode="tel" value={delivery.phone} onChange={set("phone")} placeholder="Ex. 70 12 34 56" className={field} autoComplete="tel" />
+                {tried && delivery.phone && !normalizePhone(delivery.phone) && <span className="mt-1 block font-semibold text-primary">Numéro malien à 8 chiffres, ou numéro étranger commençant par + et l'indicatif.</span>}
+              </label>
               <LocationPicker />
               <label className="text-xs font-bold text-brown">Commune ou quartier{delivery.location ? "" : " *"}<input value={delivery.area} onChange={set("area")} placeholder="Ex. Badalabougou, Hamdallaye…" className={field} autoComplete="address-level3" /></label>
               <label className="text-xs font-bold text-brown">Date ou créneau souhaité<input value={delivery.when} onChange={set("when")} placeholder="Ex. samedi matin" className={field} /></label>
@@ -148,15 +191,26 @@ export function CartDrawer() {
             <div className="mt-5">
               <PaymentPicker invalid={tried && !getPayment(delivery.payment)} />
             </div>
+            <label className={cn("mt-4 flex cursor-pointer gap-3 rounded-md border p-3 text-sm transition", delivery.jawan28 ? "border-gold bg-gold/15" : "border-border")}>
+              <input type="checkbox" checked={delivery.jawan28} onChange={(e) => { const v = e.target.checked; setDelivery((d) => ({ ...d, jawan28: v })); }} className="mt-0.5 size-4 shrink-0 accent-gold" />
+              <span>
+                <span className="block font-bold text-brown">Payer avec l'Avatar Crédit (Jawan 28)</span>
+                <span className="mt-1 block text-xs leading-5 text-muted-foreground">3 tranches de {splitInThree(total).map(formatFCFA).join(" / ")} à J0, J14 et J28. Sous réserve de validation par Djawan Sahel Meat.</span>
+              </span>
+            </label>
             {tried && issues.length > 0 && <p className="mt-3 text-xs font-semibold text-primary">Pour valider, indiquez {issues.join(", ").replace(/, ([^,]*)$/, " et $1")}.</p>}
+            <p className="mt-4 text-[11px] leading-4 text-muted-foreground">Vos informations servent uniquement à préparer et livrer votre commande.</p>
           </>
         )}
         <div className="mt-auto border-t border-border pt-4">
           <div className="flex items-baseline justify-between"><span className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Total</span><span className="text-2xl font-black text-primary">{formatFCFA(total)}</span></div>
-          <button type="button" onClick={submit} disabled={!lines.length}
-            className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-40">
-            Valider sur WhatsApp
-          </button>
+          {!done && (
+            <button type="button" onClick={submit} disabled={!lines.length || sending}
+              className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-40">
+              {sending && <Loader2 size={16} className="animate-spin" />}
+              {sending ? "Enregistrement…" : "Valider sur WhatsApp"}
+            </button>
+          )}
           <button type="button" onClick={() => setOpen(false)}
             className="mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-md border border-border px-5 py-2 text-sm font-bold text-brown transition hover:border-brown/50">
             Continuer mes achats

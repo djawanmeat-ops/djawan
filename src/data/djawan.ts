@@ -112,7 +112,13 @@ export const getMeat = (id: string) => meats.find((m) => m.id === id);
 export const formatFCFA = (value: number) =>
   `${value.toLocaleString("fr-FR").replace(/\u202f|\u00a0/g, " ")} FCFA`;
 
-export const boxPrice = (meat: Meat, formatId: FormatId) => meat.pricePerKg * getFormat(formatId).kg;
+/** Trois parts égales pour l'Avatar Crédit (Jawan 28) ; l'arrondi éventuel est reporté sur la dernière. */
+export function splitInThree(total: number) {
+  const part = Math.floor(total / 3);
+  return [part, part, total - part * 2];
+}
+
+export const boxPrice =(meat: Meat, formatId: FormatId) => meat.pricePerKg * getFormat(formatId).kg;
 
 export const mixPrice = (composition: Record<string, number>) =>
   Object.entries(composition).reduce((sum, [id, kg]) => sum + (getMeat(id)?.pricePerKg ?? 0) * kg, 0);

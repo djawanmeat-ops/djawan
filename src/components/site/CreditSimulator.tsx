@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { boxPrice, formatFCFA, formats, getFormat, getMeat, meats, whatsappUrl, type FormatId } from "@/data/djawan";
+import { boxPrice, formatFCFA, formats, getFormat, getMeat, meats, splitInThree, whatsappUrl, type FormatId } from "@/data/djawan";
 import { useCart } from "./cart";
-
-/** Trois parts égales ; l'arrondi éventuel est reporté sur la dernière. */
-function split(total: number) {
-  const part = Math.floor(total / 3);
-  return [part, part, total - part * 2];
-}
 
 export function CreditSimulator() {
   const { total: cartTotal } = useCart();
@@ -16,7 +10,7 @@ export function CreditSimulator() {
   const [format, setFormat] = useState<FormatId>("familiale");
   const meat = getMeat(meatId)!;
   const total = mode === "panier" ? cartTotal : boxPrice(meat, format);
-  const parts = split(total);
+  const parts = splitInThree(total);
   const label = mode === "panier" ? "mon panier" : `une Box ${getFormat(format).name} ${getFormat(format).kg} kg de ${meat.name}`;
   const msg = `Bonjour Djawan Sahel Meat, je souhaite vérifier mon éligibilité à l'Avatar Crédit (Jawan 28) pour ${label}, d'un montant de ${formatFCFA(total)} en 3 tranches de ${parts.map(formatFCFA).join(" / ")}.`;
   const tab = (active: boolean) => cn("flex-1 rounded-md px-3 py-2 text-sm font-bold transition", active ? "bg-gold text-brown" : "text-cream/70 hover:text-cream");
