@@ -117,6 +117,13 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  // Lien « mot de passe oublié » arrivé sur une autre page que /auth (adresse de retour refusée
+  // par l'authentification) : on le renvoie vers le formulaire de nouveau mot de passe.
+  useEffect(() => {
+    const { pathname, hash } = window.location;
+    if (pathname !== "/auth" && hash.includes("type=recovery")) window.location.replace(`/auth?reinit=1${hash}`);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
