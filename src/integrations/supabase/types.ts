@@ -14,6 +14,14 @@ export type Database = {
   }
   public: {
     Tables: {
+      jawan28_schedules: {
+        Row: { amount_due: number; amount_paid: number; due_date: string; id: string; order_id: string; tranche: number }
+        Insert: { amount_due: number; amount_paid?: number; due_date: string; id?: string; order_id: string; tranche: number }
+        Update: { amount_due?: number; amount_paid?: number; due_date?: string; id?: string; order_id?: string; tranche?: number }
+        Relationships: [
+          { foreignKeyName: "jawan28_schedules_order_id_fkey"; columns: ["order_id"]; isOneToOne: false; referencedRelation: "orders"; referencedColumns: ["id"] },
+        ]
+      }
       meat_availability: {
         Row: {
           available: boolean
@@ -132,6 +140,7 @@ export type Database = {
           delivery_when: string
           gps_accuracy: number | null
           id: string
+          jawan28_decision: string | null
           jawan28_requested: boolean
           lat: number | null
           lng: number | null
@@ -152,6 +161,7 @@ export type Database = {
           delivery_when?: string
           gps_accuracy?: number | null
           id?: string
+          jawan28_decision?: string | null
           jawan28_requested?: boolean
           lat?: number | null
           lng?: number | null
@@ -172,6 +182,7 @@ export type Database = {
           delivery_when?: string
           gps_accuracy?: number | null
           id?: string
+          jawan28_decision?: string | null
           jawan28_requested?: boolean
           lat?: number | null
           lng?: number | null
@@ -185,6 +196,15 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      payment_transactions: {
+        Row: { amount: number; comment: string; id: string; method: string; order_id: string; paid_at: string; received_by: string | null; reference: string; schedule_id: string | null }
+        Insert: { amount: number; comment?: string; id?: string; method: string; order_id: string; paid_at?: string; received_by?: string | null; reference?: string; schedule_id?: string | null }
+        Update: { amount?: number; comment?: string; id?: string; method?: string; order_id?: string; paid_at?: string; received_by?: string | null; reference?: string; schedule_id?: string | null }
+        Relationships: [
+          { foreignKeyName: "payment_transactions_order_id_fkey"; columns: ["order_id"]; isOneToOne: false; referencedRelation: "orders"; referencedColumns: ["id"] },
+          { foreignKeyName: "payment_transactions_schedule_id_fkey"; columns: ["schedule_id"]; isOneToOne: false; referencedRelation: "jawan28_schedules"; referencedColumns: ["id"] },
+        ]
       }
       promos: {
         Row: {
@@ -258,6 +278,14 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      decide_jawan28: {
+        Args: { _accept: boolean; _comment?: string; _order_id: string; _start?: string }
+        Returns: undefined
+      }
+      record_payment: {
+        Args: { _amount: number; _comment?: string; _method: string; _order_id: string; _reference: string; _schedule_id: string | null }
+        Returns: string
+      }
       set_meat_availability: {
         Args: { _available: boolean; _meat_id: string }
         Returns: undefined

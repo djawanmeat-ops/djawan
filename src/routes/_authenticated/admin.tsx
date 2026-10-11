@@ -12,6 +12,7 @@ import { ROLE_LABELS, getStaffContext } from "@/lib/orders.functions";
 import { OrdersPanel } from "@/components/admin/OrdersPanel";
 import { TeamPanel } from "@/components/admin/TeamPanel";
 import { AtelierPanel } from "@/components/admin/AtelierPanel";
+import { JawanPanel } from "@/components/admin/JawanPanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab = "commandes" | "atelier" | "promos" | "equipe";
+type Tab = "commandes" | "jawan" | "atelier" | "promos" | "equipe";
 
 function AdminPage() {
   const me = useServerFn(getStaffContext);
@@ -46,6 +47,7 @@ function AdminPage() {
   const isAdmin = roles.includes("admin");
   const tabs: { id: Tab; label: string }[] = [
     { id: "commandes", label: "Commandes" },
+    { id: "jawan", label: "Jawan 28" },
     { id: "atelier", label: "Atelier" },
     ...(isAdmin ? [{ id: "promos" as const, label: "Promos" }, { id: "equipe" as const, label: "Équipe" }] : []),
   ];
@@ -71,10 +73,10 @@ function AdminPage() {
         {roles.length > 0 && (
           <>
             {tabs.length > 1 && (
-              <nav className="mt-6 flex gap-1 rounded-lg bg-background p-1" aria-label="Sections du back-office">
+              <nav className="mt-6 flex gap-1 overflow-x-auto rounded-lg bg-background p-1" aria-label="Sections du back-office">
                 {tabs.map((t) => (
                   <button key={t.id} type="button" onClick={() => setTab(t.id)} aria-current={tab === t.id ? "page" : undefined}
-                    className={tab === t.id ? "flex-1 rounded-md bg-brown px-3 py-2 text-sm font-bold text-cream" : "flex-1 rounded-md px-3 py-2 text-sm font-bold text-brown hover:bg-muted"}>
+                    className={tab === t.id ? "flex-1 shrink-0 whitespace-nowrap rounded-md bg-brown px-3 py-2 text-sm font-bold text-cream" : "flex-1 shrink-0 whitespace-nowrap rounded-md px-3 py-2 text-sm font-bold text-brown hover:bg-muted"}>
                     {t.label}
                   </button>
                 ))}
@@ -82,6 +84,7 @@ function AdminPage() {
             )}
             <div className="mt-6">
               {tab === "commandes" && <OrdersPanel />}
+              {tab === "jawan" && <JawanPanel />}
               {tab === "atelier" && <AtelierPanel />}
               {tab === "promos" && isAdmin && <PromosPanel />}
               {tab === "equipe" && isAdmin && <TeamPanel myEmail={ctx.data!.email} />}

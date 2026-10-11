@@ -4,7 +4,8 @@ import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { MapPin, MessageCircle, Phone, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { formatFCFA, getMeat, getPayment, splitInThree } from "@/data/djawan";
+import { formatFCFA, getMeat, paymentLabel } from "@/data/djawan";
+import { PaymentsSection } from "./PaymentsSection";
 import { cn } from "@/lib/utils";
 import { formatPhone } from "@/lib/phone";
 import { NEXT_STATUS, ORDER_STATUSES, canCancel, getOrderLogs, listOrders, statusLabel, updateOrderStatus, type OrderWithItems } from "@/lib/orders.functions";
@@ -74,11 +75,11 @@ export function OrdersPanel() {
               </span>
               <span className="min-w-0">
                 <span className="block truncate font-semibold text-brown">{o.customer_name} · {formatPhone(o.customer_phone)}</span>
-                <span className="block truncate text-xs text-muted-foreground">{o.area || (o.lat ? "Position GPS" : "—")} · {o.order_items.length} article{o.order_items.length > 1 ? "s" : ""} · {o.total_kg} kg · {getPayment(o.payment_method)?.label}</span>
+                <span className="block truncate text-xs text-muted-foreground">{o.area || (o.lat ? "Position GPS" : "—")} · {o.order_items.length} article{o.order_items.length > 1 ? "s" : ""} · {o.total_kg} kg · {paymentLabel(o.payment_method)}</span>
               </span>
               <span className="flex items-center gap-2 sm:flex-col sm:items-end">
                 <span className="font-black text-primary">{formatFCFA(o.total_fcfa)}</span>
-                <span className="flex gap-1">{o.jawan28_requested && <span className="rounded-full bg-gold/30 px-2 py-0.5 text-[11px] font-bold text-brown">Jawan 28</span>}<StatusBadge status={o.status} /></span>
+                <span className="flex gap-1">{o.jawan28_requested && o.jawan28_decision !== "refuse" && <span className="rounded-full bg-gold/30 px-2 py-0.5 text-[11px] font-bold text-brown">{o.jawan28_decision ? "Jawan 28" : "Jawan 28 à valider"}</span>}<StatusBadge status={o.status} /></span>
               </span>
             </button>
           </li>
@@ -157,11 +158,7 @@ function OrderSheet({ order, onClose }: { order: OrderWithItems | null; onClose:
               <div className="mt-2 flex justify-between border-t border-border pt-3"><span className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Total</span><span className="text-xl font-black text-primary">{formatFCFA(o.total_fcfa)}</span></div>
             </section>
 
-            <section className="mt-3 rounded-lg bg-background p-4">
-              <h3 className="text-xs font-black uppercase tracking-[0.16em] text-secondary">Paiement</h3>
-              <p className="mt-2 text-sm font-semibold text-brown">{getPayment(o.payment_method)?.label ?? o.payment_method}</p>
-              {o.jawan28_requested && <p className="mt-1 text-sm text-brown">Avatar Crédit (Jawan 28) demandé — {splitInThree(o.total_fcfa).map(formatFCFA).join(" / ")} à J0, J14, J28. <span className="font-semibold text-primary">Éligibilité à valider.</span></p>}
-            </section>
+            <PaymentsSection order={o} />
 
             <section className="mt-3 rounded-lg bg-background p-4">
               <h3 className="text-xs font-black uppercase tracking-[0.16em] text-secondary">Historique</h3>

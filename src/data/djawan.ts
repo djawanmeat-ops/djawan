@@ -59,10 +59,12 @@ export const promos: Promo[] = [
 /** Moyens de paiement proposés à la validation du panier. */
 export const paymentOptions = [
   { id: "orange-money", label: "Orange Money" },
-  { id: "moov-money", label: "Moov Money" },
+  { id: "wave", label: "Wave" },
   { id: "especes", label: "Espèces à la livraison" },
 ] as const;
 export const getPayment = (id?: string) => paymentOptions.find((p) => p.id === id);
+/** Libellé d'affichage, y compris pour les moyens retirés mais présents dans d'anciennes commandes. */
+export const paymentLabel = (id: string) => getPayment(id)?.label ?? ({ "moov-money": "Moov Money" } as Record<string, string>)[id] ?? id;
 
 export type Category = "boeuf" | "mouton" | "abats" | "poulet";
 
@@ -188,7 +190,7 @@ export const faqs = [
   },
   {
     question: "Quels sont les moyens de paiement ?",
-    answer: "Vous pouvez payer par Orange Money, par Moov Money ou en espèces à la livraison. Choisissez votre moyen de paiement au moment de valider votre panier.",
+    answer: "Vous pouvez payer par Orange Money, par Wave ou en espèces à la livraison. Choisissez votre moyen de paiement au moment de valider votre panier.",
     pending: false,
   },
   {

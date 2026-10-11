@@ -179,15 +179,7 @@ export const getOrderLogs = createServerFn({ method: "GET" })
     const { data: logs, error } = await context.supabase
       .from("order_status_logs").select("*").eq("order_id", data.orderId).order("created_at");
     if (error) throw new Error("Impossible de charger l'historique.");
-    // Noms des auteurs : seul le serveur peut lire les e-mails des comptes.
-    const ids = [...new Set((logs ?? []).map((l) => l.changed_by).filter((x): x is string => !!x))];
-    const authors: Record<string, string> = {};
-    if (ids.length) {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await Promise.all(ids.map(async (id) => {
-        const { data: u } = await supabaseAdmin.auth.admin.getUserById(id);
-        if (u.user?.email) authors[id] = u.user.email;
-      }));
-    }
+    const { staffEmails } = await import("@/lib/staff-emails.server");
+    const authors = await staffEmails((logs ?? []).map((l) => l.changed_by));
     return (logs ?? []).map((l) => ({ ...l, author: l.changed_by ? (authors[l.changed_by] ?? "Équipe") : "Site web" }));
   });
