@@ -166,8 +166,15 @@ function OrderSheet({ order, onClose }: { order: OrderWithItems | null; onClose:
               <ol className="mt-2 grid gap-2 border-l border-border pl-4">
                 {(logs.data ?? []).map((l) => (
                   <li key={l.id} className="text-xs text-brown">
-                    <span className="font-bold">{fmtDate(l.created_at)}</span> · {l.author} : {l.old_status ? `${statusLabel(l.old_status)} → ` : ""}<span className="font-semibold">{statusLabel(l.new_status)}</span>
-                    {l.comment && <span className="block text-muted-foreground">{l.comment}</span>}
+                    {l.old_status === l.new_status ? (
+                      // Note sans changement de statut (décision Jawan 28, encaissement…)
+                      <><span className="font-bold">{fmtDate(l.created_at)}</span> · {l.author} : <span className="font-semibold">{l.comment}</span></>
+                    ) : (
+                      <>
+                        <span className="font-bold">{fmtDate(l.created_at)}</span> · {l.author} : {l.old_status ? `${statusLabel(l.old_status)} → ` : ""}<span className="font-semibold">{statusLabel(l.new_status)}</span>
+                        {l.comment && <span className="block text-muted-foreground">{l.comment}</span>}
+                      </>
+                    )}
                   </li>
                 ))}
               </ol>
