@@ -12,3 +12,4 @@ Les migrations écrites hors de Lovable sont rangées ici. Deux façons de les a
 | Fichier | Contenu | Appliquée |
 | --- | --- | --- |
 | `0002_commandes.sql` | Rôles pdg / gestionnaire, tables `orders`, `order_items`, `order_status_logs`, journal d'audit par trigger | oui, le 2026-10-09 via SQL editor |
+| `0003_statuts_atelier.sql` | `set_order_status()` (étapes, motif d'annulation obligatoire, historique), table `meat_availability` et `set_meat_availability()` | oui, le 2026-10-11 via SQL editor |

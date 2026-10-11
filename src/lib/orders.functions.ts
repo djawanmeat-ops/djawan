@@ -48,7 +48,7 @@ const orderSchema = z.object({
   }),
 });
 
-export type CreatedOrder = { ok: true; number: string; total: number } | { ok: false; error: string };
+export type CreatedOrder = { ok: true; number: string; total: number } | { ok: false; error: string; unavailable?: string[] };
 
 /**
  * Les prix et les libellés sont recalculés ici à partir de la grille officielle :
@@ -95,6 +95,14 @@ export const createOrder = createServerFn({ method: "POST" })
     const totalKg = items.reduce((s, i) => s + i.format_kg * i.qty, 0);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: off } = await supabaseAdmin.from("meat_availability").select("meat_id").eq("available", false);
+    const unavailable = new Set((off ?? []).map((r) => r.meat_id));
+    const blocked = data.lines.flatMap((l) => (l.mix ? Object.keys(l.mix) : [l.meatId ?? ""])).filter((id) => unavailable.has(id));
+    if (blocked.length) {
+      const names = [...new Set(blocked)].map((id) => getMeat(id)?.name ?? id).join(", ");
+      return { ok: false, error: `Momentanément indisponible : ${names}. Retirez cet article du panier pour continuer.`, unavailable: [...new Set(blocked)] };
+    }
+
     const { data: rows, error } = await supabaseAdmin.rpc("create_web_order", {
       _order: {
         customer_name: d.name, customer_phone: phone, area: d.area, delivery_when: d.when, note: d.note,
@@ -138,6 +146,30 @@ export const listOrders = createServerFn({ method: "GET" })
       throw new Error("Impossible de charger les commandes.");
     }
     return orders as OrderWithItems[];
+  });
+
+/** Étapes suivantes possibles (la base revérifie dans set_order_status). */
+export const NEXT_STATUS: Record<string, string | undefined> = {
+  nouvelle: "confirmee",
+  confirmee: "en_preparation",
+  en_preparation: "en_livraison",
+  en_livraison: "livree",
+};
+export const canCancel = (status: string) => status in NEXT_STATUS;
+
+export const updateOrderStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ orderId: z.string().uuid(), status: z.enum(ORDER_STATUSES.map((s) => s.id) as [string, ...string[]]), comment: z.string().trim().max(500) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("set_order_status", { _order_id: data.orderId, _status: data.status, _comment: data.comment });
+    if (error) {
+      console.error("updateOrderStatus", error);
+      // Les messages levés par set_order_status sont rédigés pour l'équipe.
+      throw new Error(error.code === "P0001" || error.code === "42501" ? error.message : "Modification impossible.");
+    }
+    return { ok: true };
   });
 
 export const getOrderLogs = createServerFn({ method: "GET" })

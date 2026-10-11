@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { MapPin, MessageCircle, Phone, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { formatFCFA, getMeat, getPayment, splitInThree } from "@/data/djawan";
 import { cn } from "@/lib/utils";
 import { formatPhone } from "@/lib/phone";
-import { ORDER_STATUSES, getOrderLogs, listOrders, statusLabel, type OrderWithItems } from "@/lib/orders.functions";
+import { NEXT_STATUS, ORDER_STATUSES, canCancel, getOrderLogs, listOrders, statusLabel, updateOrderStatus, type OrderWithItems } from "@/lib/orders.functions";
 
 const dateTime = new Intl.DateTimeFormat("fr-FR", { timeZone: "Africa/Bamako", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
 const fmtDate = (iso: string) => dateTime.format(new Date(iso)).replace(" ", " · ");
@@ -30,7 +31,9 @@ export function OrdersPanel() {
   const q = useQuery({ queryKey: ["admin-orders"], queryFn: () => list({ data: {} }), refetchInterval: 30_000 });
   const [status, setStatus] = useState<string>("");
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<OrderWithItems | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Toujours la version fraîche de la commande ouverte (après un changement de statut).
+  const selected = q.data?.find((o) => o.id === selectedId) ?? null;
 
   const orders = q.data ?? [];
   const counts = useMemo(() => Object.fromEntries(ORDER_STATUSES.map((s) => [s.id, orders.filter((o) => o.status === s.id).length])), [orders]);
@@ -64,7 +67,7 @@ export function OrdersPanel() {
       <ul className="mt-5 grid gap-2">
         {shown.map((o) => (
           <li key={o.id}>
-            <button type="button" onClick={() => setSelected(o)} className="grid w-full gap-1 rounded-lg border border-border bg-background p-4 text-left transition hover:border-brown/40 sm:grid-cols-[7rem_1fr_auto] sm:items-center sm:gap-4">
+            <button type="button" onClick={() => setSelectedId(o.id)} className="grid w-full gap-1 rounded-lg border border-border bg-background p-4 text-left transition hover:border-brown/40 sm:grid-cols-[7rem_1fr_auto] sm:items-center sm:gap-4">
               <span>
                 <span className="block font-display text-lg font-black text-brown">{o.number}</span>
                 <span className="text-xs text-muted-foreground">{fmtDate(o.created_at)}</span>
@@ -82,7 +85,7 @@ export function OrdersPanel() {
         ))}
       </ul>
 
-      <OrderSheet order={selected} onClose={() => setSelected(null)} />
+      <OrderSheet order={selected} onClose={() => setSelectedId(null)} />
     </div>
   );
 }
@@ -116,7 +119,9 @@ function OrderSheet({ order, onClose }: { order: OrderWithItems | null; onClose:
               <SheetDescription>Reçue le {fmtDate(o.created_at)} · {o.source === "web" ? "site web" : o.source}</SheetDescription>
             </SheetHeader>
 
-            <section className="mt-6 rounded-lg bg-background p-4">
+            <StatusActions order={o} />
+
+            <section className="mt-3 rounded-lg bg-background p-4">
               <h3 className="text-xs font-black uppercase tracking-[0.16em] text-secondary">Client</h3>
               <p className="mt-2 font-bold text-brown">{o.customer_name}</p>
               <p className="text-sm text-brown">{formatPhone(o.customer_phone)}</p>
@@ -169,12 +174,62 @@ function OrderSheet({ order, onClose }: { order: OrderWithItems | null; onClose:
                   </li>
                 ))}
               </ol>
-              <p className="mt-3 text-[11px] text-muted-foreground">Le changement de statut arrive avec la phase 2.</p>
+
             </section>
           </>
         )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+function StatusActions({ order }: { order: OrderWithItems }) {
+  const save = useServerFn(updateOrderStatus);
+  const qc = useQueryClient();
+  const [comment, setComment] = useState("");
+  const [cancelling, setCancelling] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const next = NEXT_STATUS[order.status];
+
+  async function apply(status: string) {
+    setBusy(true);
+    try {
+      await save({ data: { orderId: order.id, status, comment } });
+      toast.success(`${order.number} : ${statusLabel(status)}`);
+      setComment("");
+      setCancelling(false);
+      await Promise.all([qc.invalidateQueries({ queryKey: ["admin-orders"] }), qc.invalidateQueries({ queryKey: ["order-logs", order.id] })]);
+    } catch (e) {
+      toast.error((e as Error).message || "Modification impossible.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!next && !canCancel(order.status)) {
+    return <p className="mt-6 rounded-lg bg-background p-4 text-sm text-muted-foreground">Commande {order.status === "livree" ? "livrée" : "annulée"} : plus aucune modification possible.</p>;
+  }
+  return (
+    <section className="mt-6 rounded-lg border-2 border-brown/20 bg-background p-4">
+      <h3 className="text-xs font-black uppercase tracking-[0.16em] text-secondary">Faire avancer la commande</h3>
+      <textarea value={comment} onChange={(e) => setComment(e.target.value)} maxLength={500} rows={2}
+        placeholder={cancelling ? "Motif de l'annulation (obligatoire)" : "Commentaire pour l'historique (facultatif) — ex. confirmé par téléphone"}
+        className={cn("mt-3 w-full rounded-md border bg-background px-3 py-2 text-sm", cancelling ? "border-primary" : "border-border")} />
+      <div className="mt-2 flex flex-wrap gap-2">
+        {cancelling ? (
+          <>
+            <button type="button" disabled={busy || comment.trim().length < 3} onClick={() => apply("annulee")} className="inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-40">Confirmer l'annulation</button>
+            <button type="button" disabled={busy} onClick={() => setCancelling(false)} className="inline-flex min-h-11 items-center rounded-md border border-border px-4 text-sm font-bold text-brown">Retour</button>
+          </>
+        ) : (
+          <>
+            {next && <button type="button" disabled={busy} onClick={() => apply(next)} className="inline-flex min-h-11 items-center rounded-md bg-brown px-4 text-sm font-bold text-cream disabled:opacity-40">{busy ? "Enregistrement…" : `Passer à « ${statusLabel(next)} »`}</button>}
+            <button type="button" disabled={busy} onClick={() => setCancelling(true)} className="inline-flex min-h-11 items-center rounded-md border border-primary px-4 text-sm font-bold text-primary">Annuler la commande</button>
+          </>
+        )}
+      </div>
+      <p className="mt-2 text-[11px] text-muted-foreground">Chaque changement est inscrit dans l'historique avec votre nom et l'heure.</p>
+    </section>
   );
 }
 

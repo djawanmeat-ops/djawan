@@ -1,25 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { Database } from "@/integrations/supabase/types";
 
 export type PublicPromo = { id: string; name: string; tagline: string; offer: string; active: boolean };
 
 export const listPublicPromos = createServerFn({ method: "GET" }).handler(async (): Promise<PublicPromo[]> => {
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-  const client = createClient<Database>(process.env["SUPABASE_URL"]!, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-    global: {
-      fetch: (input, init) => {
-        const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
-        h.set("apikey", key);
-        return fetch(input, { ...init, headers: h });
-      },
-    },
-  });
-  const { data, error } = await client.rpc("get_public_promos");
+  const { createPublicClient } = await import("@/lib/public-supabase.server");
+  const { data, error } = await createPublicClient().rpc("get_public_promos");
   if (error) {
     console.error("promos", error);
     return [];

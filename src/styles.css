@@ -194,3 +194,11 @@
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* Impression du bon de préparation (onglet Atelier du back-office) : seule la zone .print-area sort. */
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; top: 0; left: 0; width: 100%; padding: 0; background: #fff; }
+  .no-print { display: none !important; }
+}

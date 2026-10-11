@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      meat_availability: {
+        Row: {
+          available: boolean
+          meat_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          available?: boolean
+          meat_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          available?: boolean
+          meat_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           cut: string | null
@@ -237,6 +258,14 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      set_meat_availability: {
+        Args: { _available: boolean; _meat_id: string }
+        Returns: undefined
+      }
+      set_order_status: {
+        Args: { _comment?: string; _order_id: string; _status: string }
+        Returns: string
+      }
       create_web_order: {
         Args: { _order: Json; _items: Json }
         Returns: { order_id: string; order_number: string }[]

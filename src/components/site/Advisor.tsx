@@ -3,12 +3,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { boxPrice, formatFCFA, getFormat, getMeat, type FormatId } from "@/data/djawan";
 import { recommendCuts, type AdvisorResult } from "@/lib/advisor.functions";
 import { useCart } from "./cart";
+import { useUnavailableMeats } from "@/hooks/use-unavailable-meats";
 
 const examples = ["Tiguadèguèna pour 8 personnes", "Grillades du week-end", "Soupe pour la famille"];
 
 export function Advisor() {
   const ask = useServerFn(recommendCuts);
   const { add } = useCart();
+  const unavailable = useUnavailableMeats();
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [res, setRes] = useState<AdvisorResult | null>(null);
@@ -56,7 +58,7 @@ export function Advisor() {
                       <p className="mt-1 text-xs leading-5 text-muted-foreground">{r.reason}</p>
                       <div className="mt-2 flex items-center justify-between gap-2">
                         <span className="text-sm font-black text-primary">{formatFCFA(boxPrice(m, f.id))}</span>
-                        <button type="button" onClick={() => add({ meatId: m.id, formatId: f.id })} className="rounded-md border border-brown px-3 py-1.5 text-xs font-bold text-brown hover:bg-brown hover:text-cream">Ajouter au panier</button>
+                        {unavailable.has(m.id) ? <span className="text-xs font-semibold text-muted-foreground">Momentanément indisponible</span> : <button type="button" onClick={() => add({ meatId: m.id, formatId: f.id })} className="rounded-md border border-brown px-3 py-1.5 text-xs font-bold text-brown hover:bg-brown hover:text-cream">Ajouter au panier</button>}
                       </div>
                     </div>
                   </li>

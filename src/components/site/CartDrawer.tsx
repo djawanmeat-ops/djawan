@@ -1,6 +1,8 @@
 import { CheckCircle2, Loader2, LocateFixed, MapPin, ShoppingBag, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { UNAVAILABLE_KEY, useUnavailableMeats } from "@/hooks/use-unavailable-meats";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { formatFCFA, getMeat, getPayment, paymentOptions, splitInThree, whatsappUrl } from "@/data/djawan";
 import { getPosition, positionError, reverseGeocode } from "@/lib/geo";
@@ -107,9 +109,16 @@ export function CartDrawer() {
    * La commande est enregistrée avant l'ouverture de WhatsApp. Si l'enregistrement échoue,
    * WhatsApp s'ouvre quand même avec le message habituel : aucune vente n'est perdue.
    */
+  const unavailable = useUnavailableMeats();
+  const qc = useQueryClient();
+  const [serverError, setServerError] = useState("");
+  const isBlocked = (l: (typeof lines)[number]) => (l.mix ? Object.keys(l.mix) : [l.meatId ?? ""]).some((id) => unavailable.has(id));
+  const blocked = lines.filter(isBlocked);
+
   const submit = async () => {
     setTried(true);
-    if (!lines.length || issues.length || sending) return;
+    setServerError("");
+    if (!lines.length || issues.length || blocked.length || sending) return;
     // Fenêtre ouverte tout de suite : ouverte après l'attente, elle serait bloquée par le navigateur.
     const win = window.open("", "_blank");
     if (win) win.opener = null;
@@ -124,6 +133,14 @@ export function CartDrawer() {
       });
     } catch (e) {
       console.error("createOrder", e);
+    }
+    if (!res.ok && res.unavailable) {
+      // Viande devenue indisponible entre-temps : on n'envoie rien, le client retire l'article.
+      win?.close();
+      setServerError(res.error);
+      qc.invalidateQueries({ queryKey: UNAVAILABLE_KEY });
+      setSending(false);
+      return;
     }
     const url = whatsappUrl(cartMessage(lines, res.ok ? res.total : total, delivery, res.ok ? res.number : undefined));
     if (win) win.location.href = url;
@@ -158,7 +175,10 @@ export function CartDrawer() {
               {lines.map((l) => (
                 <li key={l.key} className="border-b border-border py-4">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-bold text-brown">{lineLabel(l)}</p>
+                    <p className="text-sm font-bold text-brown">
+                      {lineLabel(l)}
+                      {isBlocked(l) && <span className="mt-1 block text-xs font-semibold text-primary">Momentanément indisponible — retirez cet article.</span>}
+                    </p>
                     <button type="button" onClick={() => remove(l.key)} aria-label={`Retirer ${lineLabel(l)} du panier`}
                       className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs font-bold text-primary transition hover:border-primary">
                       <Trash2 size={14} /> Retirer
@@ -198,6 +218,7 @@ export function CartDrawer() {
                 <span className="mt-1 block text-xs leading-5 text-muted-foreground">3 tranches de {splitInThree(total).map(formatFCFA).join(" / ")} à J0, J14 et J28. Sous réserve de validation par Djawan Sahel Meat.</span>
               </span>
             </label>
+            {(serverError || (tried && blocked.length > 0)) && <p className="mt-3 text-xs font-semibold text-primary" role="alert">{serverError || "Un article de votre panier n'est plus disponible : retirez-le pour valider."}</p>}
             {tried && issues.length > 0 && <p className="mt-3 text-xs font-semibold text-primary">Pour valider, indiquez {issues.join(", ").replace(/, ([^,]*)$/, " et $1")}.</p>}
             <p className="mt-4 text-[11px] leading-4 text-muted-foreground">Vos informations servent uniquement à préparer et livrer votre commande.</p>
           </>

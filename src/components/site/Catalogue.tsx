@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useUnavailableMeats } from "@/hooks/use-unavailable-meats";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { boxPrice, categories, cutOptions, formatFCFA, formats, getFormat, melangeImage, meats, mixPrice, type FormatId, type Meat } from "@/data/djawan";
@@ -32,19 +33,20 @@ export function CutPicker({ value, onChange }: { value: string; onChange: (c: st
 }
 
 /** Fiche compacte : le choix du format, de la découpe et de la quantité se fait dans ProductDialog. */
-function ProductCard({ meat, onChoose }: { meat: Meat; onChoose: () => void }) {
+function ProductCard({ meat, onChoose, unavailable }: { meat: Meat; onChoose: () => void; unavailable: boolean }) {
   return (
-    <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card">
-      <button type="button" onClick={onChoose} tabIndex={-1} aria-hidden="true" className="aspect-[4/3] overflow-hidden">
-        <img src={meat.image} alt={`Box ${meat.name} — paquets sous vide dans le carton Djawan`} width={800} height={597} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]" />
+    <article className={cn("group flex flex-col overflow-hidden rounded-lg border border-border bg-card", unavailable && "opacity-60")}>
+      <button type="button" onClick={onChoose} disabled={unavailable} tabIndex={-1} aria-hidden="true" className="relative aspect-[4/3] overflow-hidden">
+        <img src={meat.image} alt={`Box ${meat.name} — paquets sous vide dans le carton Djawan`} width={800} height={597} loading="lazy" decoding="async" className={cn("h-full w-full object-cover transition duration-500", unavailable ? "grayscale" : "group-hover:scale-[1.035]")} />
+        {unavailable && <span className="absolute inset-x-2 top-2 rounded-full bg-brown/90 px-2 py-1 text-center text-[11px] font-bold text-cream">Momentanément indisponible</span>}
       </button>
       <div className="flex flex-1 flex-col gap-3 p-3 sm:gap-4 sm:p-5">
         <div>
           <h3 className="font-display text-base leading-tight font-bold text-brown sm:text-xl">{meat.name}</h3>
           <p className="mt-1 text-xs text-muted-foreground sm:text-sm">{formatFCFA(meat.pricePerKg)} / kg</p>
         </div>
-        <button type="button" className={cn(btn, "mt-auto min-h-11 px-3")} onClick={onChoose} aria-label={`Choisir ${meat.name}`}>
-          Choisir
+        <button type="button" className={cn(btn, "mt-auto min-h-11 px-3")} onClick={onChoose} disabled={unavailable} aria-label={unavailable ? `${meat.name} indisponible` : `Choisir ${meat.name}`}>
+          {unavailable ? "Indisponible" : "Choisir"}
         </button>
       </div>
     </article>
@@ -112,6 +114,7 @@ function MixTeaser({ onOpen }: { onOpen: () => void }) {
 }
 
 function MixBuilder() {
+  const unavailable = useUnavailableMeats();
   const [format, setFormat] = useState<FormatId>("decouverte");
   const [mix, setMix] = useState<Record<string, number>>({});
   const [cut, setCut] = useState("aucune");
@@ -142,12 +145,12 @@ function MixBuilder() {
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary transition-all" style={{ width: `${(used / target) * 100}%` }} /></div>
         <ul className="mt-5 grid max-h-80 gap-x-6 overflow-y-auto pr-1 sm:grid-cols-2">
           {meats.map((m) => (
-            <li key={m.id} className="flex items-center justify-between gap-3 border-b border-border py-2.5">
-              <div className="min-w-0"><p className="truncate text-sm font-semibold text-brown">{m.name}</p><p className="text-xs text-muted-foreground">{formatFCFA(m.pricePerKg)} / kg</p></div>
+            <li key={m.id} className={cn("flex items-center justify-between gap-3 border-b border-border py-2.5", unavailable.has(m.id) && "opacity-50")}>
+              <div className="min-w-0"><p className="truncate text-sm font-semibold text-brown">{m.name}</p><p className="text-xs text-muted-foreground">{unavailable.has(m.id) ? "Momentanément indisponible" : `${formatFCFA(m.pricePerKg)} / kg`}</p></div>
               <div className="flex shrink-0 items-center gap-2">
                 <button type="button" aria-label={`Retirer 1 kg de ${m.name}`} onClick={() => change(m.id, -1)} disabled={!mix[m.id]} className="size-10 rounded-md border border-border font-bold text-brown disabled:opacity-30">−</button>
                 <span className="w-9 text-center text-sm font-black">{mix[m.id] ?? 0} kg</span>
-                <button type="button" aria-label={`Ajouter 1 kg de ${m.name}`} onClick={() => change(m.id, 1)} disabled={used >= target} className="size-10 rounded-md border border-border font-bold text-brown disabled:opacity-30">+</button>
+                <button type="button" aria-label={`Ajouter 1 kg de ${m.name}`} onClick={() => change(m.id, 1)} disabled={used >= target || unavailable.has(m.id)} className="size-10 rounded-md border border-border font-bold text-brown disabled:opacity-30">+</button>
               </div>
             </li>
           ))}
@@ -168,6 +171,7 @@ function MixBuilder() {
 export function Catalogue() {
   const [cat, setCat] = useState<(typeof categories)[number]["id"]>("tout");
   const [selected, setSelected] = useState<Meat | null>(null);
+  const unavailable = useUnavailableMeats();
   const tabsRef = useRef<HTMLDivElement>(null);
   const list = cat === "tout" ? meats : meats.filter((m) => m.category === cat);
   const openMix = () => {
@@ -187,7 +191,7 @@ export function Catalogue() {
       <div className="mt-8">
         {cat === "melange" ? <MixBuilder /> : (
           <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-            {list.map((m) => <ProductCard key={m.id} meat={m} onChoose={() => setSelected(m)} />)}
+            {list.map((m) => <ProductCard key={m.id} meat={m} unavailable={unavailable.has(m.id)} onChoose={() => setSelected(m)} />)}
           </div>
         )}
       </div>

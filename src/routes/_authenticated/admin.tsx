@@ -11,6 +11,7 @@ import { listAdminPromos, updatePromo, type PublicPromo } from "@/lib/promos.fun
 import { ROLE_LABELS, getStaffContext } from "@/lib/orders.functions";
 import { OrdersPanel } from "@/components/admin/OrdersPanel";
 import { TeamPanel } from "@/components/admin/TeamPanel";
+import { AtelierPanel } from "@/components/admin/AtelierPanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab = "commandes" | "promos" | "equipe";
+type Tab = "commandes" | "atelier" | "promos" | "equipe";
 
 function AdminPage() {
   const me = useServerFn(getStaffContext);
@@ -45,6 +46,7 @@ function AdminPage() {
   const isAdmin = roles.includes("admin");
   const tabs: { id: Tab; label: string }[] = [
     { id: "commandes", label: "Commandes" },
+    { id: "atelier", label: "Atelier" },
     ...(isAdmin ? [{ id: "promos" as const, label: "Promos" }, { id: "equipe" as const, label: "Équipe" }] : []),
   ];
 
@@ -80,6 +82,7 @@ function AdminPage() {
             )}
             <div className="mt-6">
               {tab === "commandes" && <OrdersPanel />}
+              {tab === "atelier" && <AtelierPanel />}
               {tab === "promos" && isAdmin && <PromosPanel />}
               {tab === "equipe" && isAdmin && <TeamPanel myEmail={ctx.data!.email} />}
             </div>
