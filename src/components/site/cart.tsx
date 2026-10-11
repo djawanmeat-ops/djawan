@@ -71,7 +71,7 @@ export function lineCut(line: CartLine) {
   return c && c.id !== "aucune" ? c.label : null;
 }
 
-export function cartMessage(lines: CartLine[], total: number, d?: Delivery, orderNumber?: string) {
+export function cartMessage(lines: CartLine[], total: number, d?: Delivery, orderNumber?: string, deliveryCode?: string) {
   const rows = lines.map((l) => {
     let s = `• ${l.qty} × ${lineLabel(l)} : ${formatFCFA(linePrice(l))}`;
     if (l.mix) s += "\n" + Object.entries(l.mix).map(([id, kg]) => `   - ${getMeat(id)?.name} : ${kg} kg`).join("\n");
@@ -93,6 +93,7 @@ export function cartMessage(lines: CartLine[], total: number, d?: Delivery, orde
     if (payment) msg += `\n\nPaiement : ${payment.label}`;
     if (d.jawan28) msg += `\nAvatar Crédit (Jawan 28) demandé : 3 tranches de ${splitInThree(total).map(formatFCFA).join(" / ")} (J0, J14, J28), sous réserve de validation.`;
   }
+  if (deliveryCode) msg += `\n\nMon code de réception : ${deliveryCode} (à donner au livreur)`;
   return msg;
 }
 

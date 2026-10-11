@@ -6,6 +6,7 @@ import { MapPin, MessageCircle, Phone, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { formatFCFA, getMeat, paymentLabel } from "@/data/djawan";
 import { PaymentsSection } from "./PaymentsSection";
+import { DeliverySection } from "./DeliverySection";
 import { cn } from "@/lib/utils";
 import { formatPhone } from "@/lib/phone";
 import { NEXT_STATUS, ORDER_STATUSES, canCancel, getOrderLogs, listOrders, statusLabel, updateOrderStatus, type OrderWithItems } from "@/lib/orders.functions";
@@ -158,6 +159,7 @@ function OrderSheet({ order, onClose }: { order: OrderWithItems | null; onClose:
               <div className="mt-2 flex justify-between border-t border-border pt-3"><span className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Total</span><span className="text-xl font-black text-primary">{formatFCFA(o.total_fcfa)}</span></div>
             </section>
 
+            <DeliverySection order={o} />
             <PaymentsSection order={o} />
 
             <section className="mt-3 rounded-lg bg-background p-4">
@@ -232,6 +234,7 @@ function StatusActions({ order }: { order: OrderWithItems }) {
           </>
         )}
       </div>
+      {order.status === "en_livraison" && <p className="mt-2 text-xs font-semibold text-brown">Pour terminer, utilisez « Confirmer la remise » dans la section Livreur & remise.</p>}
       <p className="mt-2 text-[11px] text-muted-foreground">Chaque changement est inscrit dans l'historique avec votre nom et l'heure.</p>
     </section>
   );

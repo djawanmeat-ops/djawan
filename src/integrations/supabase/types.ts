@@ -14,6 +14,12 @@ export type Database = {
   }
   public: {
     Tables: {
+      couriers: {
+        Row: { active: boolean; created_at: string; id: string; name: string; phone: string; vehicle: string }
+        Insert: { active?: boolean; created_at?: string; id?: string; name: string; phone: string; vehicle?: string }
+        Update: { active?: boolean; created_at?: string; id?: string; name?: string; phone?: string; vehicle?: string }
+        Relationships: []
+      }
       jawan28_schedules: {
         Row: { amount_due: number; amount_paid: number; due_date: string; id: string; order_id: string; tranche: number }
         Insert: { amount_due: number; amount_paid?: number; due_date: string; id?: string; order_id: string; tranche: number }
@@ -138,6 +144,12 @@ export type Database = {
           customer_name: string
           customer_phone: string
           delivery_when: string
+          assigned_at: string | null
+          courier_id: string | null
+          delivered_at: string | null
+          delivered_to: string | null
+          delivery_code: string
+          delivery_code_verified: boolean | null
           gps_accuracy: number | null
           id: string
           jawan28_decision: string | null
@@ -159,6 +171,12 @@ export type Database = {
           customer_name: string
           customer_phone: string
           delivery_when?: string
+          assigned_at?: string | null
+          courier_id?: string | null
+          delivered_at?: string | null
+          delivered_to?: string | null
+          delivery_code?: string
+          delivery_code_verified?: boolean | null
           gps_accuracy?: number | null
           id?: string
           jawan28_decision?: string | null
@@ -180,6 +198,12 @@ export type Database = {
           customer_name?: string
           customer_phone?: string
           delivery_when?: string
+          assigned_at?: string | null
+          courier_id?: string | null
+          delivered_at?: string | null
+          delivered_to?: string | null
+          delivery_code?: string
+          delivery_code_verified?: boolean | null
           gps_accuracy?: number | null
           id?: string
           jawan28_decision?: string | null
@@ -278,6 +302,14 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      assign_courier: {
+        Args: { _courier_id: string | null; _order_id: string }
+        Returns: undefined
+      }
+      confirm_delivery: {
+        Args: { _code: string; _comment?: string; _order_id: string; _receiver: string }
+        Returns: undefined
+      }
       decide_jawan28: {
         Args: { _accept: boolean; _comment?: string; _order_id: string; _start?: string }
         Returns: undefined
@@ -296,7 +328,7 @@ export type Database = {
       }
       create_web_order: {
         Args: { _order: Json; _items: Json }
-        Returns: { order_id: string; order_number: string }[]
+        Returns: { order_id: string; order_number: string; delivery_code: string }[]
       }
     }
     Enums: {

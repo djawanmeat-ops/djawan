@@ -48,7 +48,7 @@ const orderSchema = z.object({
   }),
 });
 
-export type CreatedOrder = { ok: true; number: string; total: number } | { ok: false; error: string; unavailable?: string[] };
+export type CreatedOrder = { ok: true; number: string; total: number; deliveryCode: string } | { ok: false; error: string; unavailable?: string[] };
 
 /**
  * Les prix et les libellés sont recalculés ici à partir de la grille officielle :
@@ -116,7 +116,7 @@ export const createOrder = createServerFn({ method: "POST" })
       console.error("createOrder", error);
       return { ok: false, error: "Enregistrement impossible pour le moment." };
     }
-    return { ok: true, number: created.order_number, total };
+    return { ok: true, number: created.order_number, total, deliveryCode: created.delivery_code };
   });
 
 // ---------------------------------------------------------------------------------------------
@@ -153,9 +153,9 @@ export const NEXT_STATUS: Record<string, string | undefined> = {
   nouvelle: "confirmee",
   confirmee: "en_preparation",
   en_preparation: "en_livraison",
-  en_livraison: "livree",
+  // « Livrée » passe par confirmDelivery (code de réception), pas par un simple changement de statut.
 };
-export const canCancel = (status: string) => status in NEXT_STATUS;
+export const canCancel = (status: string) => ["nouvelle", "confirmee", "en_preparation", "en_livraison"].includes(status);
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

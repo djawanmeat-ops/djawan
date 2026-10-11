@@ -103,7 +103,7 @@ export function CartDrawer() {
   };
   const create = useServerFn(createOrder);
   const [sending, setSending] = useState(false);
-  const [done, setDone] = useState<{ number: string; url: string } | null>(null);
+  const [done, setDone] = useState<{ number: string; url: string; code: string } | null>(null);
 
   /**
    * La commande est enregistrée avant l'ouverture de WhatsApp. Si l'enregistrement échoue,
@@ -142,13 +142,13 @@ export function CartDrawer() {
       setSending(false);
       return;
     }
-    const url = whatsappUrl(cartMessage(lines, res.ok ? res.total : total, delivery, res.ok ? res.number : undefined));
+    const url = whatsappUrl(cartMessage(lines, res.ok ? res.total : total, delivery, res.ok ? res.number : undefined, res.ok ? res.deliveryCode : undefined));
     if (win) win.location.href = url;
     else window.location.href = url;
     if (res.ok) {
       clear();
       setTried(false);
-      setDone({ number: res.number, url });
+      setDone({ number: res.number, url, code: res.deliveryCode });
     }
     setSending(false);
   };
@@ -165,6 +165,11 @@ export function CartDrawer() {
             <CheckCircle2 size={44} className="mx-auto text-whatsapp" />
             <p className="mt-4 font-display text-2xl font-black text-brown">Commande {done.number} enregistrée</p>
             <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-muted-foreground">Envoyez le message WhatsApp qui s'est ouvert : notre équipe vous répond pour confirmer la livraison.</p>
+            <div className="mx-auto mt-5 max-w-xs rounded-lg border-2 border-dashed border-gold bg-gold/10 p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-secondary">Votre code de réception</p>
+              <p className="mt-1 font-display text-4xl font-black tracking-[0.3em] text-brown">{done.code}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Donnez-le au livreur à la remise de votre box. Il figure aussi dans votre message WhatsApp.</p>
+            </div>
             <a href={done.url} target="_blank" rel="noreferrer" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-md bg-whatsapp px-5 text-sm font-bold text-whatsapp-foreground">WhatsApp ne s'est pas ouvert ? Cliquez ici</a>
           </div>
         ) : lines.length === 0 ? (

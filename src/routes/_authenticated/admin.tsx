@@ -13,6 +13,7 @@ import { OrdersPanel } from "@/components/admin/OrdersPanel";
 import { TeamPanel } from "@/components/admin/TeamPanel";
 import { AtelierPanel } from "@/components/admin/AtelierPanel";
 import { JawanPanel } from "@/components/admin/JawanPanel";
+import { LivraisonsPanel } from "@/components/admin/LivraisonsPanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab = "commandes" | "jawan" | "atelier" | "promos" | "equipe";
+type Tab = "commandes" | "livraisons" | "jawan" | "atelier" | "promos" | "equipe";
 
 function AdminPage() {
   const me = useServerFn(getStaffContext);
@@ -47,6 +48,7 @@ function AdminPage() {
   const isAdmin = roles.includes("admin");
   const tabs: { id: Tab; label: string }[] = [
     { id: "commandes", label: "Commandes" },
+    { id: "livraisons", label: "Livraisons" },
     { id: "jawan", label: "Jawan 28" },
     { id: "atelier", label: "Atelier" },
     ...(isAdmin ? [{ id: "promos" as const, label: "Promos" }, { id: "equipe" as const, label: "Équipe" }] : []),
@@ -84,6 +86,7 @@ function AdminPage() {
             )}
             <div className="mt-6">
               {tab === "commandes" && <OrdersPanel />}
+              {tab === "livraisons" && <LivraisonsPanel />}
               {tab === "jawan" && <JawanPanel />}
               {tab === "atelier" && <AtelierPanel />}
               {tab === "promos" && isAdmin && <PromosPanel />}
