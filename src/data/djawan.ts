@@ -143,20 +143,59 @@ export const shareMeta = (path: string) => [
 /** Numéro WhatsApp officiel Djawan Sahel Meat, format international sans « + ». */
 export const WHATSAPP_NUMBER = "22371699120";
 
+/** Zones de livraison validées par Djawan (les six communes du district de Bamako, plus les environs). */
+export const deliveryCommunes = ["Commune I", "Commune II", "Commune III", "Commune IV", "Commune V", "Commune VI"];
+
+/** Prix au kg minimum et maximum d'une famille de viande, pour les textes et données SEO. */
+export function priceRange(category: Category) {
+  const prices = meats.filter((m) => m.category === category).map((m) => m.pricePerKg);
+  return { min: Math.min(...prices), max: Math.max(...prices) };
+}
+
 /** Fiche « commerce local » pour Google. N'y mettre que des informations validées. */
 export const businessJsonLd = {
   "@context": "https://schema.org",
   "@type": "Store",
+  "@id": `${SITE_URL}/#commerce`,
   name: "Djawan Sahel Meat",
-  description: "Box de viande fraîche (bœuf, mouton, poulet, abats) avec livraison à domicile à Bamako et environs. Commande sur WhatsApp.",
+  description: "Boucherie en ligne à Bamako : box de viande fraîche (bœuf, mouton, poulet, abats) conditionnée sous vide, livrée à domicile dans les communes I à VI et les environs. Commande sur WhatsApp.",
   slogan: "Viande fraîche • Qualité • Confiance",
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
   image: `${SITE_URL}/og-image.jpg`,
   telephone: `+${WHATSAPP_NUMBER}`,
   currenciesAccepted: "XOF",
+  paymentAccepted: "Orange Money, Wave, Espèces",
+  priceRange: `${Math.min(...meats.map((m) => m.pricePerKg))} - ${Math.max(...meats.map((m) => m.pricePerKg))} FCFA / kg`,
   address: { "@type": "PostalAddress", addressLocality: "Bamako", addressCountry: "ML" },
-  areaServed: { "@type": "City", name: "Bamako" },
+  areaServed: [
+    ...deliveryCommunes.map((name) => ({ "@type": "AdministrativeArea", name: `${name}, Bamako` })),
+    { "@type": "City", name: "Bamako" },
+  ],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Box de viande fraîche",
+    itemListElement: meats.map((m) => ({
+      "@type": "Offer",
+      itemOffered: { "@type": "Product", name: `${m.name} — box de viande fraîche`, category: m.category },
+      priceCurrency: "XOF",
+      priceSpecification: { "@type": "UnitPriceSpecification", price: m.pricePerKg, priceCurrency: "XOF", unitCode: "KGM", referenceQuantity: { "@type": "QuantitativeValue", value: 1, unitCode: "KGM" } },
+      availability: "https://schema.org/InStock",
+      areaServed: "Bamako",
+    })),
+  },
+};
+
+/** Nom du site affiché par Google dans les résultats. */
+export const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${SITE_URL}/#site`,
+  name: "Djawan Sahel Meat",
+  alternateName: ["Djawan", "Djawan Meat"],
+  url: `${SITE_URL}/`,
+  inLanguage: "fr",
+  publisher: { "@id": `${SITE_URL}/#commerce` },
 };
 
 export function whatsappUrl(message: string) {
@@ -180,8 +219,8 @@ export const faqs = [
   },
   {
     question: "Où livrez-vous ?",
-    answer: "Nous livrons à Bamako et dans les environs. La zone exacte est confirmée au moment de la commande.",
-    pending: true,
+    answer: "Nous livrons à domicile dans les six communes de Bamako (Communes I, II, III, IV, V et VI) et dans les environs. Pour une adresse hors de Bamako, la livraison est confirmée au moment de la commande sur WhatsApp.",
+    pending: false,
   },
   {
     question: "Comment commander ?",
@@ -195,8 +234,13 @@ export const faqs = [
   },
   {
     question: "Comment fonctionne l’Avatar Crédit ?",
-    answer: "Vous choisissez votre box et réglez votre paiement en trois tranches sur une période de 28 jours.",
-    pending: true,
+    answer: "Vous choisissez votre box et réglez en trois tranches égales sur 28 jours : à la commande (J0), à J14 et à J28, sans frais ajoutés. Cochez « Payer avec l’Avatar Crédit » dans le panier ; la demande est validée par notre équipe.",
+    pending: false,
+  },
+  {
+    question: "Quel est le prix de la viande au kg ?",
+    answer: `Nos prix sont affichés sur chaque fiche, sans frais cachés : bœuf de ${formatFCFA(priceRange("boeuf").min)} à ${formatFCFA(priceRange("boeuf").max)} le kilo, mouton à ${formatFCFA(priceRange("mouton").min)}, poulet de ${formatFCFA(priceRange("poulet").min)} à ${formatFCFA(priceRange("poulet").max)}, abats et os à partir de ${formatFCFA(priceRange("abats").min)}. Le prix de votre box se calcule automatiquement selon le format choisi (5, 10, 15 ou 20 kg).`,
+    pending: false,
   },
   {
     question: "Quel est le délai de livraison ?",
@@ -204,3 +248,14 @@ export const faqs = [
     pending: true,
   },
 ];
+
+/** FAQ en données structurées (seulement les réponses validées). */
+export const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.filter((f) => !f.pending).map((f) => ({
+    "@type": "Question",
+    name: f.question,
+    acceptedAnswer: { "@type": "Answer", text: f.answer },
+  })),
+};

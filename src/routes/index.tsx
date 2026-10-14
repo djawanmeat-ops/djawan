@@ -15,21 +15,22 @@ import { CartDrawer } from "@/components/site/CartDrawer";
 import { Advisor } from "@/components/site/Advisor";
 import { CreditSimulator } from "@/components/site/CreditSimulator";
 import { PromoBanner } from "@/components/site/PromoBanner";
-import { SITE_URL, businessJsonLd, defaultWhatsappUrl, faqs, shareMeta, whatsappUrl } from "@/data/djawan";
+import { SITE_URL, businessJsonLd, defaultWhatsappUrl, faqJsonLd, faqs, shareMeta, websiteJsonLd, whatsappUrl } from "@/data/djawan";
+import { LocalSeo } from "@/components/site/LocalSeo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Djawan Sahel Meat — Viande fraîche et box à Bamako" },
-      { name: "description", content: "Djawan Sahel Meat propose des box de viande fraîche avec livraison à domicile à Bamako et environs. Découvrez nos formats et commandez facilement sur WhatsApp." },
-      { property: "og:title", content: "Djawan Sahel Meat — Viande fraîche et box à Bamako" },
-      { property: "og:description", content: "Des box de viande fraîche, adaptées à vos besoins et livrées à Bamako et environs." },
+      { title: "Viande fraîche livrée à domicile à Bamako | Djawan Sahel Meat" },
+      { name: "description", content: "Boucherie en ligne à Bamako : bœuf, mouton, poulet en box de 5 à 20 kg, prix au kilo affichés. Livraison communes I à VI, paiement Orange Money ou Wave." },
+      { property: "og:title", content: "Viande fraîche livrée à domicile à Bamako | Djawan Sahel Meat" },
+      { property: "og:description", content: "Bœuf, mouton, poulet en box de 5 à 20 kg, livrés chez vous à Bamako. Commande en ligne, validation sur WhatsApp." },
       { property: "og:type", content: "website" },
       ...shareMeta("/"),
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: `${SITE_URL}/` }],
-    scripts: [{ type: "application/ld+json", children: JSON.stringify(businessJsonLd) }],
+    scripts: [businessJsonLd, websiteJsonLd, faqJsonLd].map((data) => ({ type: "application/ld+json", children: JSON.stringify(data) })),
   }),
   component: Index,
 });
@@ -46,7 +47,7 @@ function Index() {
           <div className="relative mx-auto flex min-h-[calc(92svh-5rem)] max-w-7xl items-center px-5 py-16 lg:px-8">
             <div className="hero-enter max-w-3xl">
               <p className="mb-6 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-gold"><span className="h-px w-10 bg-gold" />Bamako & environs</p>
-              <h1 className="font-display max-w-2xl text-5xl leading-[0.96] font-black sm:text-7xl lg:text-[5.5rem]">L'excellence de la viande, livrée chez vous.</h1>
+              <h1 className="font-display max-w-2xl text-5xl leading-[0.96] font-black sm:text-7xl lg:text-[5.5rem]">La viande fraîche livrée chez vous, à Bamako.</h1>
               <p className="mt-7 max-w-xl text-base leading-7 text-cream/80 sm:text-lg">Des pièces choisies une à une, conditionnées sous vide et réunies dans nos box signature. Livrées à domicile, à Bamako et environs.</p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Button href={defaultWhatsappUrl} target="_blank" rel="noreferrer">Commander sur WhatsApp</Button>
@@ -127,6 +128,8 @@ function Index() {
           <div className="absolute inset-0 bg-commitment-overlay" />
           <Reveal className="relative mx-auto max-w-7xl"><p className="text-xs font-black uppercase tracking-[0.2em] text-gold">Nos engagements</p><h2 className="mt-8 max-w-3xl font-display text-5xl leading-[1.05] font-black sm:text-7xl">La fraîcheur.<br />La qualité.<br />La confiance.</h2><p className="mt-8 max-w-lg leading-7 text-cream/75">Trois piliers qui guident chacune de nos box, de la sélection jusqu'à votre table.</p></Reveal>
         </section>
+
+        <LocalSeo />
 
         <section id="faq" className="scroll-mt-20 bg-cream px-5 py-24 lg:px-8 lg:py-32">
           <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.65fr_1fr] lg:gap-24">
